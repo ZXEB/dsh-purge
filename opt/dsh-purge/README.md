@@ -135,7 +135,7 @@ node scripts/install.mjs --target <同一目录> --uninstall
 - **不改原状态文件格式**：`ladder.json` 只多一个可选字段，原插件读不懂也不会崩。
 - **`cordis.patch.yml`** 只追加一个托管块（`# >>> dsh-purge-opt companion begin`），
   卸载时按标记精确删除，不会伤到原插件自己的 insert 行。
-- **插件升级**：npm 只铺 `files` 白名单里的文件，我们的 11 个模块会消失 →
+- **插件升级**：npm 只铺 `files` 白名单里的文件，我们的 12 个模块会消失 →
   **升级后重跑一次 `install.mjs`**（幂等）。这是这套方案的已知代价；
   想彻底免维护，就把这些模块并进上游仓库（见 §6 建议）。
 - **钩子顺序**：companion 插在原插件之后，所以原插件的 pre-step / assemble 先注册，

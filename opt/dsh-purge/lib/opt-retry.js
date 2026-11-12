@@ -14,7 +14,8 @@
 //     每次重试改写给所有 system 消息，而不是只改第一条。
 //   · 重试上限可配（默认 2），到限仍拒则交付"最接近的可用版本"并记审计，
 //     由阶梯模块把最后一档钉进后续请求。
-import { logAudit } from "./audit.js";
+import { logAudit as __logAuditMaybe } from "./opt-audit-shim.js";
+const logAudit = __logAuditMaybe;
 import { refusalScore, looksLikeRefusalV2, REFUSAL_THRESHOLD } from "./opt-signal.js";
 
 export const RETRY_NUDGE = [

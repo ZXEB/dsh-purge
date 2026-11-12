@@ -12,7 +12,8 @@
 //     遇到 "You are an AI agent. Be brief." 会误删掉后半句有用约束）。
 //   · 段落去重：同名段只留一条，防止插件重复 apply 时提示词翻倍。
 //   · 失败退回上游原始装配，绝不炸对话。
-import { logAudit } from "./audit.js";
+import { logAudit as __logAuditMaybe } from "./opt-audit-shim.js";
+const logAudit = __logAuditMaybe;
 
 const OWN_PREFIX = "dsh-purge";
 

@@ -9,7 +9,8 @@
 //   · 形态锁按题面类别动态生成（见 opt-form.js），不是一份固定话术。
 //   · 拒绝痕迹判据改用 opt-signal 的打分，减少"讨论拒绝也被当成拒绝"的误触。
 import { randomUUID } from "node:crypto";
-import { logAudit } from "./audit.js";
+import { logAudit as __logAuditMaybe } from "./opt-audit-shim.js";
+const logAudit = __logAuditMaybe;
 import { formLockFor, normalizeTask } from "./opt-form.js";
 import { refusalScore } from "./opt-signal.js";
 

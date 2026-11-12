@@ -5,7 +5,8 @@
 //   · 所有钩子自带幂等标记（ctx.__dshPurgeOpt*），重复 install 不会重复挂。
 //   · 任何一层挂不上都只降级该层，其余照常工作，并在审计里留一条。
 //   · 段注册走宿主真实 API；没有 API 就不装，绝不伪造一个"看起来装了"的返回值。
-import { logAudit } from "./audit.js";
+import { logAudit as __logAuditMaybe } from "./opt-audit-shim.js";
+const logAudit = __logAuditMaybe;
 import { installAssembleLayer } from "./opt-assemble.js";
 import { installLockLayer } from "./opt-lock.js";
 import { streamWithOptRetry } from "./opt-retry.js";

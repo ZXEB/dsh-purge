@@ -24,6 +24,7 @@ const PKG_LIB = path.join(HERE, "..", "lib");
 
 const COPY = [
   "runtime-state.js",
+  "opt-audit-shim.js",
   "opt-signal.js",
   "opt-form.js",
   "opt-retry.js",

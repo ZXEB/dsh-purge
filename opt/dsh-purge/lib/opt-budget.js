@@ -9,7 +9,8 @@
 //   解决：启动自检 + 自愈：目录重建、坏文件 quarantine、必填字段补齐，
 //   结果写一条审计；全部失败也不阻塞插件加载。
 import fs from "node:fs";
-import { logAudit } from "./audit.js";
+import { logAudit as __logAuditMaybe } from "./opt-audit-shim.js";
+const logAudit = __logAuditMaybe;
 import { readStateSync, stateDir, writeStateSync } from "./runtime-state.js";
 
 export const BUDGET_FILE = "opt-budget.json";

@@ -1,5 +1,5 @@
 {
-  "name": "dsh-purge-opt",
+  "name": "armor-kit-purge-opt",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -13,6 +13,9 @@
     "test": "node scripts/selftest.mjs && node scripts/smoke-host.mjs",
     "verify": "node scripts/selftest.mjs && node scripts/smoke-host.mjs"
   },
-  "engines": { "node": ">=18" },
-  "license": "MIT"
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT",
+  "description": "armor-kit 的 purge-opt 增强层：独立运行时不依赖社区版 audit.js，装上社区版自动复用。"
 }

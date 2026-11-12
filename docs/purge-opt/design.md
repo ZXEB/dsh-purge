@@ -1,11 +1,11 @@
-# dsh-purge-opt — 1.1.71 对照增强补丁包
+# purge-opt · armor-kit 增强层
 
-对照对象：本机安装的 `dsh-purge-community@1.6.93`（`~/.dsh/profiles/web/node_modules/dsh-purge-community`）
-对照基线：上游 `ZXEB/dsh-purge@master`（package.json `1.1.71`，commit `719a741`）
+放在 `armor-kit/purge-opt/` 下，由 `install.sh` 与 `patch/apply.mjs` 一起铺到社区版 `lib/`。
 
-这个包不改宿主源码、不改上游文件。它是**一组可选增强层**：装进已安装插件的 `lib/`，
-由 `cordis.patch.yml` 多插一行 companion 插件，把各层挂到同一个 ctx 上。
-卸载 = 删文件 + 删那一行，原插件行为不受影响。
+**前置条件：必须先有社区版 `dsh-purge-community`。** 没有社区版时本包的 12 个模块
+不会被任何东西调用，等于没装——`install.sh` 第 [1/6] 步会自动装社区版，装不上就直接 die。
+上游 `dsh-purge@1.1.71` 不能替代：本包挂的是社区版的钩子名与段名（`dsh-purge-boost`、
+`dsh-purge-ladder`、`agent/pre-step`、`system-prompt/assemble`、`llm/stream`）。
 
 ---
 
@@ -135,7 +135,7 @@ node scripts/install.mjs --target <同一目录> --uninstall
 - **不改原状态文件格式**：`ladder.json` 只多一个可选字段，原插件读不懂也不会崩。
 - **`cordis.patch.yml`** 只追加一个托管块（`# >>> dsh-purge-opt companion begin`），
   卸载时按标记精确删除，不会伤到原插件自己的 insert 行。
-- **插件升级**：npm 只铺 `files` 白名单里的文件，我们的 12 个模块会消失 →
+- **插件升级**：npm 只铺 `files` 白名单里的文件，我们的 11 个模块会消失 →
   **升级后重跑一次 `install.mjs`**（幂等）。这是这套方案的已知代价；
   想彻底免维护，就把这些模块并进上游仓库（见 §6 建议）。
 - **钩子顺序**：companion 插在原插件之后，所以原插件的 pre-step / assemble 先注册，

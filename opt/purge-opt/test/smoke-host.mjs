@@ -15,8 +15,8 @@ const check = (name, ok, detail = "") => {
   console.log(`${ok ? "PASS" : "FAIL"} ${name}${detail ? "  " + detail : ""}`);
 };
 
-const { installOpt } = await import("../lib/opt.js");
-const { resetLadder, readLadder, bumpLadder } = await import("../lib/opt-ladder.js");
+const { installOpt } = await import("../opt.js");
+const { resetLadder, readLadder, bumpLadder } = await import("../opt-ladder.js");
 
 /** 最小事件总线：模拟 ctx.on(event, handler, opts)，按注册顺序链式调用。 */
 function makeHost() {

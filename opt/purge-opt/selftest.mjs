@@ -15,15 +15,15 @@ function check(name, ok, detail = "") {
   if (!ok || verbose) console.log(`${ok ? "PASS" : "FAIL"} ${name}${detail ? "  " + detail : ""}`);
 }
 
-const { refusalScore, looksLikeRefusalV2, REFUSAL_THRESHOLD } = await import("../lib/opt-signal.js");
-const { formCategory, formLockFor, normalizeTask, needsFormRepair } = await import("../lib/opt-form.js");
-const { buildLock, lockDecision } = await import("../lib/opt-lock.js");
-const { rewriteAssembly, isPureIdentity, scrubIdentity } = await import("../lib/opt-assemble.js");
-const ladder = await import("../lib/opt-ladder.js");
-const { readStateSync, writeStateSync, statePath } = await import("../lib/runtime-state.js");
-const { createProbe, readProbe, probeText } = await import("../lib/opt-probe.js");
-const { chargeBudget, readBudget, resetBudget, selfHeal } = await import("../lib/opt-budget.js");
-const { installOpt, readOpt, writeOpt, optContextText } = await import("../lib/opt.js");
+const { refusalScore, looksLikeRefusalV2, REFUSAL_THRESHOLD } = await import("./opt-signal.js");
+const { formCategory, formLockFor, normalizeTask, needsFormRepair } = await import("./opt-form.js");
+const { buildLock, lockDecision } = await import("./opt-lock.js");
+const { rewriteAssembly, isPureIdentity, scrubIdentity } = await import("./opt-assemble.js");
+const ladder = await import("./opt-ladder.js");
+const { readStateSync, writeStateSync, statePath } = await import("./runtime-state.js");
+const { createProbe, readProbe, probeText } = await import("./opt-probe.js");
+const { chargeBudget, readBudget, resetBudget, selfHeal } = await import("./opt-budget.js");
+const { installOpt, readOpt, writeOpt, optContextText } = await import("./opt.js");
 
 // ---------- 1. 拒绝打分 ----------
 const refusals = [

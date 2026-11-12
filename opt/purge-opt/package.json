@@ -9,8 +9,8 @@
     "./lib/*": "./lib/*"
   },
   "scripts": {
-    "check": "node --check lib/opt-audit-shim.js && node --check lib/opt.js && node --check lib/opt-retry.js && node --check lib/opt-lock.js && node --check lib/opt-assemble.js && node --check lib/opt-signal.js && node --check lib/opt-form.js && node --check lib/opt-ladder.js && node --check lib/runtime-state.js && node --check lib/opt-probe.js && node --check lib/opt-budget.js",
-    "test": "node scripts/selftest.mjs && node scripts/smoke-host.mjs",
+    "check": "for f in *.js; do node --check \"$f\" || exit 1; done",
+    "test": "node selftest.mjs && node test/smoke-host.mjs",
     "verify": "node scripts/selftest.mjs && node scripts/smoke-host.mjs"
   },
   "engines": {

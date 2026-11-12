@@ -20,7 +20,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
-const PKG_LIB = path.join(HERE, "..", "lib");
+const PKG_LIB = HERE; // next/ 目录本身就是模块目录（扁平布局）
 
 const COPY = [
   "runtime-state.js",
@@ -125,7 +125,7 @@ function companionBlock(pkgName) {
     YML_BEGIN,
     `  - insert:`,
     `      - id: ${COMPANION_ID}`,
-    `        name: '${pkgName}/opt-companion'`,
+    `        name: '${pkgName}/lib/opt-companion.js'`,
     `        inject: [systemPrompt, tools]`,
     `        config:`,
     `          base: '${pkgName}'`,

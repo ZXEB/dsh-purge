@@ -2861,6 +2861,24 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 		let rewindWorkspace = null;
 		let rewindConversation = null;
 		let pendingComposer = { sessionId: "", text: "", at: 0 };
+		let composerEditAt = 0;
+		const markComposerEdit = (e) => {
+			try {
+				const t = e && e.target;
+				if (t && t.closest && t.closest("[data-composer-input],[data-composer-card],[data-composer-seat],textarea")) composerEditAt = Date.now();
+			} catch { /* ignore */ }
+		};
+		for (const ev of ["beforeinput", "input", "keydown", "compositionstart", "compositionupdate"]) {
+			try { document.addEventListener(ev, markComposerEdit, true); } catch { /* ignore */ }
+		}
+		function composerIsBusy() {
+			try {
+				const el = document.activeElement;
+				if (!el || !el.closest) return false;
+				if (!el.closest("[data-composer-input],[data-composer-card],[data-composer-seat],textarea")) return false;
+				return Date.now() - composerEditAt < 3000;
+			} catch { return false; }
+		}
 		let armedFill = { sessionId: "", text: "", at: 0 };
 
 		function rewindText(t, key, fallback) {
@@ -2995,6 +3013,7 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 
 		function hostSetDraft(sessionId, text) {
 			if (!sessionId) return false;
+			if (composerIsBusy()) return false;
 			try {
 				const input = conversationInput(sessionId);
 				if (input && typeof input.setDraft === "function") {
@@ -3006,6 +3025,7 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 		}
 
 		function fillComposer(inputActions, text) {
+			if (composerIsBusy()) return;
 			if (inputActions && typeof inputActions.setDraft === "function") {
 				try { inputActions.setDraft(text || ""); } catch { /* ignore */ }
 			}
@@ -8260,7 +8280,7 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 					if (typeof e.stopImmediatePropagation === "function") e.stopImmediatePropagation();
 				};
 				const onKey = (e) => {
-					if (e.key !== "Enter" || e.shiftKey || e.isComposing) return;
+					if (e.key !== "Enter" || e.shiftKey || e.isComposing || e.keyCode === 229 || e.which === 229) return;
 					const inComposer = e.target && e.target.closest
 						&& e.target.closest("[data-composer-card], [data-composer-seat], [contenteditable='true'], textarea");
 					if (!inComposer) return;

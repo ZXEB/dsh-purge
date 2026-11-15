@@ -32,3 +32,6 @@ default-prompt-inject.md
 /official-harness-payload.7z
 *.asar
 *.asar.bak
+
+# 本地改写前的备份（core.js.bak-* / client.js.bak-*）
+*.bak-*

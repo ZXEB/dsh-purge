@@ -1,6 +1,6 @@
 {
   "name": "dsh-purge",
-  "version": "1.1.74",
+  "version": "1.1.75",
   "description": "DeepSeek Harness 本地运行时适配插件：一张可回滚的宿主默认值与提示词段补丁表，支持面板状态查看、一键应用/还原/卸载。 Local runtime adaptation plugin for DeepSeek Harness - a reversible patch table for host defaults and prompt segments.",
   "type": "module",
   "main": "lib/index.js",

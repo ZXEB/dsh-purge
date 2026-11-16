@@ -95,3 +95,54 @@ node bin/dsh-purge.js --uninstall  # 还原 + 清除插件登记
 ```
 
 若某个条目在你的 dsh 版本上显示 `skipped`，说明该版本这段原文与本适配基准不同：条目保持原样，不会产生半改文件，可安全忽略。
+
+---
+
+## 7. 第三轮（1.1.74）：实测回归 + 2 条修复
+
+前两节是纸面校准。这一轮改用 **npm `0.2.2-rc.3` 全部 51 个包的原始产物**搭出 `node_modules/@deepseek-ai` 布局，直接跑 `applyPatches()` 验证，发现 2 个真问题。
+
+### 7.1 修复条目
+
+| # | 名称 | 问题 | 处理 |
+|---|---|---|---|
+| 17 | `FS_OBSERVATION_INTENT_FREE` | rc.3 把 `editIntent` 的读前校验抽成 `requirePresent(target, actor, "edit")`，原来的内联体锚点在 rc.3 上完全不存在。结果是 0.2.0-rc.2 上 `applied`、rc.3 上 `skipped` —— 这是真回归，不是常态。 | 追加 rc.3 形态锚点：`editIntent` 直接 `return void 0` |
+| 65 | `HOOKS_PRESTEP_REJECT_NEUTRAL` | replace 会把 `if (merged.decision === "deny")` 文本**写回去**，而 #30/#31 的锚点正是这句话。于是第一次应用后文本回退、第二次应用才被 #30 重新吃掉 → 「应用一次」与「应用两次」产物不同，不幂等。 | replace 直接输出 `__dsh_purge_deny_disabled__` 形态，不再写回 `"deny"`；同时保留两条 marker 注释，保证 #65 自身仍判 `applied` |
+
+### 7.2 本轮实测结果
+
+基准：npm `0.2.2-rc.3` 原始产物（干净未打补丁）。
+
+| 检查 | 结果 |
+|---|---|
+| `applyPatches(ALL_PATCHES)` 一次 | applied **65** / skipped **6** / missing_file **1** / na **10** |
+| 被改写文件 | 49 个；全部 `node --check` 通过，**0 语法错误** |
+| 幂等性 | apply 1 次 与 apply 3 次 产物**逐字节一致**（0 差异） |
+| `#17` 语义 | `writeIntent` / `editIntent` 均为无条件 `return void 0` |
+| `#30` `#31` `#65` | 均为 `applied`，不再需要第二轮收敛 |
+
+### 7.3 剩余 6 条 `skipped`：无目标可改，不是适配缺陷
+
+| # | 名称 | 原因 |
+|---|---|---|
+| 32 | `WEB_SURFACE_IDENTITY_NEUTRAL` | rc.3 已整段删除 `You are interacting with the user through the DeepSeek Harness Web GUI at ${webUrl}.`；对 51 个包全量搜索，该句与 `Canonical local URL` 均无匹配 —— 没有文本可替换 |
+| 53 | `WEB_SURFACE_PROHIBITION` | 同上，属同一段 web surface 文案 |
+| 40 | `COMPLETE_PROMPT_KEEP_INJECT` | 0.1.5 兼容条目；2.x 的 `system-prompt` 已无该段 waterfall 形态 |
+| 56 | `REWIND_HIDE_CUT_ONLY` | 前端 bundle 重新压缩发布，`rewind-*` 标记不再出现；`optional`，只影响回退后的列表润色 |
+| 77 | `REWIND_DROP_SENT_ON_APPEND` | 同上 |
+| 80 | `MINIMAL_OFFICIAL_TOOLSET` | 各版本（含 0.2.0-rc.2）常态 `skipped` |
+
+`missing_file` 仍为 `#71`，依赖第三方 `@linxin666/dsh-liangshen` 预设，干净安装下本就没有。
+
+### 7.4 复现本次实测
+
+```sh
+# 1) 取 rc.3 原始产物（51 个包）
+npm pack @deepseek-ai/dsh-agent-instructions@0.2.2-rc.3   # 其余包同理
+# 2) 解出 package/ 内容，铺成 <fixture>/dsh-<pkg>/{lib,cordis.patch.yml,...}
+# 3) 指向该 fixture 跑
+node -e "import('./lib/core.js').then(async m=>{const s=await m.patchStatus('<fixture>',m.ALL_PATCHES);console.log(s)})"
+# 4) 幂等回归：对两份副本分别 apply 1 次 / 3 次，逐字节比对
+```
+
+> 说明：上述验证只覆盖 npm 发行包。桌面版 `app.asar` 内联布局、客户端槽位加载、重启后重复注册等运行时行为，需要在真实安装上另行确认。

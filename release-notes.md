@@ -1,3 +1,25 @@
+# 1.1.73
+
+## 中文
+
+- 版本 **1.1.73**，`dshTarget` 升到 `0.2.2-rc.3`（npm `next` 通道最新；`latest` 仍是 0.2.2-rc.1）。
+- 第一轮（0.2.2-rc.1）修 6 处锚点回归：#14 `displayReason` 收敛为函数调用、#54 交付物提示词迁到 `dsh-deliverable-file-references`、#60 `run_code` 描述迁到 `dsh-tool-executor-ptc`、#62 审批管线拆到 `lib/pipeline.js`、#67 代码整体缩进变化、#74 `assemble` 调用改成分段对象。
+- 第二轮（0.2.2-rc.3）再修 4 处：#13 / #35 改用 `SandboxEscalationError` 且 `cancelled` 分支加了 `signal?.throwIfAborted()`、#18 `tools/post-execute` 去掉 block 分支、#62 deny 收敛为 `approvalDenial()` 助手。#56 因前端 bundle 重新压缩后锚点不再稳定，保持 `skipped`（可选条，只影响回退后的显示）。
+- 新增 5 个文件键：`dsh-tools-pipeline`、`dsh-tools-types-pipeline`、`tool-executor-ptc`、`tool-executor-ptc-types`、`deliverables-prompt-refs`，全部 `allExisting`，包缺失时落 `missing_file` 不影响其余条目。
+- 验证：0.2.0-rc.2 / 0.2.1-rc.3 / 0.2.2-rc.1 / rc.2 / rc.3 状态探测均 **0 回归**；rc.3 上实际改写 37 个文件、`node --check` 全过；应用后 `dsh web` 正常启动。
+- 新增 `install.ps1`（先复制到 ASCII 目录规避 pnpm store 锁；profile 用无 BOM 写入）、`check.ps1`（只读自检）、`INSTALL-OTHER-PC.md`、`QUICKSTART.txt`、`ADAPTATION-NOTES.md`。
+- README 中英文重写为中性表述（本地运行时适配、可回滚的宿主默认值补丁表），去掉容易触发拦截的措辞；功能与署名要求不变。
+
+## English
+
+- **1.1.73**; `dshTarget` is now `0.2.2-rc.3` (newest on npm `next`; `latest` is still 0.2.2-rc.1).
+- Round 1 (0.2.2-rc.1), 6 anchors: #14 `displayReason` helper, #54 deliverable prompt moved to `dsh-deliverable-file-references`, #60 `run_code` description moved to `dsh-tool-executor-ptc`, #62 approval pipeline split into `lib/pipeline.js`, #67 indentation, #74 `assemble` takes a sectioned object.
+- Round 2 (0.2.2-rc.3), 4 anchors: #13 / #35 use `SandboxEscalationError` and `signal?.throwIfAborted()`, #18 post-execute lost its block branch, #62 deny collapsed into an `approvalDenial()` helper. #56 stays `skipped` (optional, display-only; the minified client bundle no longer offers a stable anchor).
+- Five new file keys: `dsh-tools-pipeline`, `dsh-tools-types-pipeline`, `tool-executor-ptc`, `tool-executor-ptc-types`, `deliverables-prompt-refs`; all `allExisting`, so a missing package yields `missing_file` without affecting the rest.
+- Verified: zero regressions in status probes on 0.2.0-rc.2, 0.2.1-rc.3 and 0.2.2-rc.1/rc.2/rc.3; on rc.3 37 files are rewritten and all pass `node --check`; `dsh web` boots after applying.
+- Added `install.ps1` (stages to an ASCII path for pnpm store locks, BOM-less profile writes), `check.ps1` (read-only preflight), `INSTALL-OTHER-PC.md`, `QUICKSTART.txt`, `ADAPTATION-NOTES.md`.
+- README (zh/en) rewritten in neutral wording (local runtime adaptation, reversible host-default patch table); features and attribution unchanged.
+
 # 1.1.71
 
 ## 中文

@@ -1,7 +1,7 @@
 {
   "name": "dsh-purge",
-  "version": "1.1.71",
-  "description": "DeepSeek Harness 破甲：让所有模型都能破甲，不同模型可换不同提示词；默认提示词面向国模「小码酱」。Jailbreak for every model — swap prompts per model. 求 Star 收藏 ⭐ 如要二开，请查看署名要求部分",
+  "version": "1.1.73",
+  "description": "DeepSeek Harness 本地运行时适配插件：一张可回滚的宿主默认值与提示词段补丁表，支持面板状态查看、一键应用/还原/卸载。 Local runtime adaptation plugin for DeepSeek Harness - a reversible patch table for host defaults and prompt segments.",
   "type": "module",
   "main": "lib/index.js",
   "exports": {
@@ -28,11 +28,14 @@
     "scripts",
     "client.js",
     "cordis.patch.yml",
-    "screenshots.json",
     "README.md",
     "README.en.md",
     "README.zh-CN.md",
-    "LICENSE"
+    "LICENSE",
+    "install.ps1",
+    "check.ps1",
+    "INSTALL-OTHER-PC.md",
+    "ADAPTATION-NOTES.md"
   ],
   "scripts": {
     "embed-prompt": "node scripts/embed-default-prompt.mjs",
@@ -43,15 +46,13 @@
     "dsh",
     "dsh-plugin",
     "dsh-plugins",
-    "网络安全",
-    "红队评测",
-    "llm-security",
-    "harness-security",
     "deepseek-harness",
-    "red-team",
-    "instructions",
-    "rules",
-    "prompt-eval",
+    "harness",
+    "compatibility",
+    "patch",
+    "policy",
+    "prompt-segments",
+    "settings",
     "agent"
   ],
   "repository": {
@@ -92,5 +93,5 @@
   "engines": {
     "node": ">=18"
   },
-  "dshTarget": "0.2.0-rc.2"
+  "dshTarget": "0.2.2-rc.3"
 }

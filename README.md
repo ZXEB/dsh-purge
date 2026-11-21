@@ -53,9 +53,9 @@
 
 | 你会得到 | 说明 |
 |---|---|
-| **侧栏面板** | 会话标题旁的按钮，右侧栏两页：**适配** / **演练台（可选模块）** |
+| **侧栏面板** | 会话标题旁的按钮，右侧栏两页：**适配** / **工作台（可选模块）** |
 | **适配页** | 分组显示补丁状态；应用 / 还原 / 卸载；提示词编辑；多套规则集 |
-| **演练台** | 本机资产与技能清点页，首次进入需确认授权声明；不使用可以完全不进 |
+| **工作台** | 本机资产与技能清点页，首次进入需确认授权声明；不使用可以完全不进 |
 | **宿主默认值** | 提示词段、权限策略、工具上限、卡片行为统一取值；官方能力保留 |
 | **启动自检** | 可选开启；npm/pnpm 重装覆盖 `node_modules` 后不必手改文件 |
 
@@ -273,7 +273,7 @@ powershell -ExecutionPolicy Bypass -File .\check.ps1 -Profile desktop
 | 路径 | 说明 |
 |---|---|
 | `bin/dsh-purge.js` | CLI 入口（`--status / --apply / --revert / --uninstall / --edit`） |
-| `lib/` | 补丁引擎、路径探测、shim 写入、更新、卸载、演练台（`lib/redteam/`） |
+| `lib/` | 补丁引擎、路径探测、shim 写入、更新、卸载、扩展工作台（`lib/redteam/`） |
 | `lib/core.js` | 补丁表与匹配引擎（本适配版的主要改动都在这里） |
 | `lib/asset-table.js` | 内置加密提示词（由 `scripts/embed-default-prompt.mjs` 生成） |
 | `client.js` | 侧栏前端产物（构建自 `scripts/build-client.mjs`） |
@@ -289,7 +289,7 @@ powershell -ExecutionPolicy Bypass -File .\check.ps1 -Profile desktop
 | `rules/` | 规则集（`AGENTS.md` / `CLAUDE.md`） |
 | `skills/<id>/SKILL.md` | 导入的技能 |
 | `net-scope-allow.txt` | 本机设备地址清单 |
-| `redteam/` | 演练台事实库（SQLite，可选模块） |
+| `redteam/` | 工作台本地状态库（SQLite，可选模块） |
 | `dsh-purge/` | 插件状态：`applied.json`、`override-state.json`、`installed-rev` 等 |
 
 ---
@@ -317,7 +317,7 @@ dsh-purge --help
 purge_status   purge_apply   purge_revert
 ```
 
-面板：**适配** 页从上到下是补丁状态、提示词、本机地址清单、规则集、Skill；**演练台** 页首次进入需确认声明（读声明 → 等倒计时 → 滚到文末 → 勾三项）。
+面板：**适配** 页从上到下是补丁状态、提示词、本机地址清单、规则集、Skill；**工作台** 页首次进入需确认声明（读声明 → 等倒计时 → 滚到文末 → 勾三项）。
 
 ---
 
@@ -454,13 +454,13 @@ dsh plugin --profile web allow-version dsh-purge@1.1.76 --dsh-version <你的精
 
 | 插件版本 | 适配 dsh | 说明 |
 |---|---|---|
-| **1.1.76**（本适配版） | **0.2.2-rc.5** | 适配 rc.5 全部 332 包 + `pi-ai@1.6`；补齐红队预设/子代理接口/`CONTENT_REFUSED`，恢复 `#32` `#56` `#77` `#57` |
+| **1.1.76**（本适配版） | **0.2.2-rc.5** | 适配 rc.5 全部 332 包 + `pi-ai@1.6`；补齐扩展预设/子代理接口/`CONTENT_REFUSED`，恢复 `#32` `#40` `#56` `#77` `#57` 并修复首次升级重复解包 |
 | 1.1.76 同版向下 | 0.2.2-rc.1~rc.4、0.2.1-rc.x、0.2.0-rc.2 | 状态探测 **0 回归**，旧写法锚点与 `listChildren` 回退均保留 |
 | 1.1.75 | 0.2.2-rc.3 | 修复 `{{cwd}}` 变量缺失、组装兜底丢工具与 DSML 正文重试 |
 | 1.1.73–1.1.74 | 0.2.2-rc.3 | 锚点重校准 + 读前校验与 hooks 幂等修复 |
 | 1.1.71（上游镜像） | 0.2.0-rc.2 | 原仓库镜像版，0.2.2 上有 6 条锚点失效 |
 
-未命中项在面板里显示 `skipped`，只影响那一条，不会产生半改文件。在 0.2.2 上应用后常态 `skipped` 仅剩 `#40`（0.1.5 专用兼容项）与 `#80`（旧版极简工具表回退项）。
+未命中项在面板里显示 `skipped`，只影响那一条，不会产生半改文件。在 0.2.2 桌面端应用后常态 `skipped` 仅剩 `#80`（旧版极简工具表回退项）与 `#82`（旧版桌面回退项）。
 
 不适配的条目不会被盲改，只会 `pending` / `skipped`。
 

@@ -3,12 +3,12 @@
 ## 中文
 
 - 版本 **1.1.76**，`dshTarget` 升到 **`0.2.2-rc.5`**（npm `latest` / `next` 及桌面端 `nightly` 最新版）。
-- 演练台预设适配 `0.2.1+` / `0.2.2-rc.5` 子代理配置架构：移除已删除的子路径 `@deepseek-ai/dsh-tool-subagent-control/list-agents`、会直接抛错的 `toolFilter`、已移除的 `backgroundMode` 与 `workflow-worker-thread`，将 `modelSelectionSettings` 迁移为 `modelSelection` + `modelDiscovery`（保留 `maxDepth: 1` 叶子约束）；`repairDelegation()` 支持就地自动修复已有用户预设且保留自定义人设。
+- 扩展预设适配 `0.2.1+` / `0.2.2-rc.5` 子代理配置架构：移除已删除的子路径 `@deepseek-ai/dsh-tool-subagent-control/list-agents`、会直接抛错的 `toolFilter`、已移除的 `backgroundMode` 与 `workflow-worker-thread`，将 `modelSelectionSettings` 迁移为 `modelSelection` + `modelDiscovery`（保留 `maxDepth: 1` 叶子约束）；`repairDelegation()` 支持就地自动修复已有用户预设且保留自定义人设。
 - 修复 `lib/redteam/tools.js` 与 `lib/redteam/ui.js` 对已移除 `ctx.subagents.listChildren()` 的依赖：在 `0.2.1-rc.2+` 上回退到 `ctx.subagents.listDescendants()`，同时保留旧版宿主兼容。
 - 适配 `0.2.2-rc.4/rc.5` 新增的 `CONTENT_REFUSED` 错误码：将其及 `0.2.2` 确定性不可重试码加入 `lib/continue-retry.js` 的 `PERMANENT_CODES`，避免内容安全拒答或配置错误反复重试。
-- 恢复 5 项此前在 0.2.2 失效/跳过的补丁锚点：`#32`（`dsh-web-app` 的 `Advertised URL` 文案）、`#40`（`0.2.2+` `dsh-system-prompt` 新增 `tools` 与 `requiredContexts` 后的完整提示词保注入锚点，解决桌面端首次解包清洗触发 `hostCleanMarkersPresent` 回滚）、`#56` 与 `#77`（压缩版 `dsh-client-ui-conversation/lib/client.js` 回退隐藏逻辑）、`#57`（`@earendil-works/pi-ai@1.3+/1.6+` `openai-responses-shared.js` 的 `instructionRole` 变量名）。
+- 恢复 5 项此前在 0.2.2 失效/跳过的补丁锚点：`#32`（`dsh-web-app` 的 `Advertised URL` 文案）、`#40`（`0.2.2+` `dsh-system-prompt` 新增 `tools` 与 `requiredContexts` 后的完整提示词保注入锚点，解决桌面端首次解包适配触发 `hostCleanMarkersPresent` 回滚）、`#56` 与 `#77`（压缩版 `dsh-client-ui-conversation/lib/client.js` 回退隐藏逻辑）、`#57`（`@earendil-works/pi-ai@1.3+/1.6+` `openai-responses-shared.js` 的 `instructionRole` 变量名）。
 - 修复 `lib/reapply.js` 在官方桌面端首次解包升级时因 `unpacked-asar.json` 尚未落盘而重复解包 `app.asar` 一次的问题。
-- 验证：真实 Windows 桌面端 `0.2.2-rc.5` 升级解包实测 applied **73** / pending **0** / failed **0**，49 个补丁目标 JS 语法全过，真实 `0.2.2-rc.5` 宿主启动加载全部插件且红队预设 `registered`（`broken: null`）；`0.2.2-rc.3` 向下兼容 0 回归。
+- 验证：真实 Windows 桌面端 `0.2.2-rc.5` 升级解包实测 applied **73** / pending **0** / failed **0**，49 个补丁目标 JS 语法全过，真实 `0.2.2-rc.5` 宿主启动加载全部插件且扩展预设 `registered`（`broken: null`）；`0.2.2-rc.3` 向下兼容 0 回归。
 
 ## English
 
@@ -66,7 +66,7 @@
 
 - 版本 **1.1.70**。
 - Hub / 残装若给 `dsh-purge` 加上 `pluginPackages`，Cordis 会一直 pending，宿主退出码 1。本版把依赖钉回 `systemPrompt` + `tools`。
-- 清洗页只合并升级链展示（免责、审批、挂全文、hooks 等），Apply 仍打全部补丁。
+- 适配页只合并升级链展示（免责、审批、挂全文、hooks 等），Apply 仍打全部补丁。
 - 去掉已无用的 #81 / #89 清单行；挂全文并进 #87，官方 phase-1 走静默放行。
 - 指挥端改为「按用户给的目标开工」。合并 #97 / #98 / #99。
 
@@ -85,9 +85,9 @@
 - 版本 **1.1.69**。
 - 发送时剥掉 ChatML / `project_instructions`，框和磁盘不动。
 - 应用 + 重启挂当前默认，不必再点保存；框里仍是插件旧默认会刷到加密槽。
-- 红队只排不折：注入 → cap → 红队正文；目标卡/角色段改名 `dshpg-*`。
+- 扩展预设段落顺序调整：注入 → cap → 预设正文；目标卡/角色段改名 `dshpg-*`。
 - 隔离 ctx 也注册 inject/cap；#86 steer 改 next-turn；#87 hang 用 LF 比对。
-- 红队操作稿锁「上面的提示词作准」；指挥端去掉「给了单位名就授权」。
+- 预设说明稿锁「上面的提示词作准」；指挥端去掉「给了单位名就授权」。
 
 ## English
 
@@ -104,7 +104,7 @@
 
 - 版本 **1.1.68**。
 - **#92**：技能面板认 YAML 块标量 `description`（`|` / `>`），不再误报不可用。
-- **#93**：红队「版本/更新」：`file://` 转成本地路径；Windows 用 `.cmd` + `shell` 起 npm/pnpm；npm 404 回落 GitHub tags。
+- **#93**：工作台「版本/更新」：`file://` 转成本地路径；Windows 用 `.cmd` + `shell` 起 npm/pnpm；npm 404 回落 GitHub tags。
 - **#94**：官方桌面 CLI 入口补 `app.asar.unpacked` 回退。Hub 首次安装仍可能撞官方 asar 路径。
 - **#95**：拆除 `refusal-recover`（读错字段永不触发；修好会无限复读）。
 - **#96**：bash 前台等待从插件标过的 600s 迁回 60s，后续工具不再被堵 10 分钟。
@@ -127,7 +127,7 @@
 - 版本 **1.1.67**。
 - **#85**：continue 续跑在传输/429 连错时不再无限兜圈。`takeContinue` 加 failStreak 阈值；`refundContinue` 不清 `lastContinueSeq`，连错 ≥3 直接放弃。
 - **#84**：区域拦截的空 Assistant 流改为单批 `text-chunks` 记录（带 `.length`），不再卡住宿主 UI。
-- 启动种子：进程启动时若 `$DSH_HOME/prompt-inject.md` 为空或缺失，自动把加密默认稿写一次；用户改过的稿不动。清洗完点重启后，重启成功立刻就能用默认提示词。
+- 启动种子：进程启动时若 `$DSH_HOME/prompt-inject.md` 为空或缺失，自动把加密默认稿写一次；用户改过的稿不动。应用补丁并重启后，重启成功立刻就能用默认提示词。
 - Windows 官方包重启：restart 脚本名改成 `pid+random`，首启不与并发实例打架；多余的 `.cmd` 中介删掉，直接 `wscript.exe //nologo //B` 起脚本；本机旧版无 pid 后缀的脚本/日志超过 24h 启动时自动清。
 - 杀进程范围收紧：`ASAR_SWAP_PS1` 不再 `/IM` 杀全名同名进程，只按安装根下 pid 停，避免误伤第三方同名。
 - 官方 CLI shim 原地改写之前先存一份 `.dsh-purge.bak`，并走原子写，断电/盘满可回退。
@@ -157,16 +157,16 @@
 ## 中文
 
 - 版本 **1.1.66**。
-- **#80**：清洗页可关掉 hooks deny / ask 旁路。关掉且文件干净显示跳过，不计入已应用；关掉后再打开，64/65 会按官方形态再打一次。
+- **#80**：适配页可切换 hooks deny / ask 策略。关掉且文件干净显示跳过，不计入已应用；关掉后再打开，64/65 会按官方形态再打一次。
 - **#81**：继续 / 拒答续跑的来源 kind 改为 `dsh-purge`；限流和传输失败不再自动续一轮。
 - 重启后不用点保存也会挂上默认提示词；每一轮都补回全文。空的应用请求不再清空磁盘上的提示词。
 - 声明过的 overlay 只剩 `.dshpurge.bak` 时，应用会先拷回再加载。
-- 红队报告补上得分点短名。中文 README 恢复题图和预览图。
+- 任务报告补上得分点短名。中文 README 恢复题图和预览图。
 
 ## English
 
 - **1.1.66**.
-- **#80**: The clean page can turn off the hooks deny/ask bypass. Off + clean files show skipped and are not counted as applied. Turning it back on reapplies 64/65 from the official form.
+- **#80**: The adaptation page can toggle the hooks deny/ask policy. Off + clean files show skipped and are not counted as applied. Turning it back on reapplies 64/65 from the official form.
 - **#81**: Continue / refusal-recover use source kind `dsh-purge`. RATE_LIMIT and TRANSPORT no longer start another continue turn.
 - Restart hangs the default prompt without a Save click; every step puts the full text back. An empty Apply body no longer wipes the disk prompt.
 - A declared overlay that exists only as `.dshpurge.bak` is copied back before load.
@@ -178,7 +178,7 @@
 
 - 版本 **1.1.65**。
 - 默认提示词按 `lib/default-prompt-inject.md` 重新加密进槽。磁盘上仍是用户自己改过的稿时，不覆盖。
-- 红队接入截图登记、得分点看图，以及报告六段。可把某次演练导出成目录。
+- 工作台接入截图登记、得分点看图，以及报告六段。可把某次任务记录导出成目录。
 - 技能正文缺工具路径、缺密钥或 VPS 还是占位符时，不再把整条技能标成不可用。缺口留在详情里。
 - 打开页面或组装提示词时，会把当前默认稿同步到磁盘，不必先点保存。
 - 删掉没有调用的桌面启动封装、旧迁移脚本，以及已经注释掉的手动继续入口。
@@ -197,14 +197,14 @@
 ## 中文
 
 - 版本 **1.1.64**。
-- 红队流程八项。角色稿只在**新建靶标**时播种；已经建好的靶标，要在演练台里把智能体同步一次才会换成新稿。
-- **内网**改为叶子节点，自己按收集、梳理、发现、利用做，不再往下派活。
+- 扩展工作流八项。角色稿只在**新建项目**时播种；已经建好的项目，要在工作台里把智能体同步一次才会换成新稿。
+- **子网任务角色**改为叶子节点，按独立阶段顺序执行，不再往下派活。
 - 并发名额：不带 key 的 release 只放最早的一条。子智能体结束由服务端自动释放；手动释放必须带上 acquire 返回的 key。
 - 预检带 `include` 时只体检点名的技能，不再被全局缺密钥拖成失败。缺项带上由用户执行的修复说明。
 - IPv6 计分至少两个冒号，`dc01:389` 这类主机名不再 ×3。计分只留在 `score-rules.js`。
-- 攻击链计分跳过已停用的得分点。
+- 步骤链统计跳过已停用的得分点。
 - `.env` 认 `export KEY=value`。未加引号的行内注释会剥掉，引号里的 `#` 保留。
-- 内网计分 code 改为 `central-system`、`boundary-logical`、`boundary-strong` 等，以 `redteam_score_list` 实际返回为准。
+- 子网阶段记录 code 改为 `central-system`、`boundary-logical`、`boundary-strong` 等，以 `redteam_score_list` 实际返回为准。
 - 漏洞发现和利用从 `priority=high` 打起。优先级为空时，先回报指挥补一轮评估。
 - 删掉没有调用的代码。设置页里过期的 `legacyApplyPath(...)` 调用改为 `applyPathOp`。
 
@@ -256,7 +256,7 @@
 
 - 版本 **1.1.61**。
 - **多宿主 Apply**：npm-global 与桌面 `resources/app` 一并补丁（#72 类路径问题）。
-- **#73**：代理 / IP / DNS 等 benign 话题不再误触攻击闸门（`net-scope.js`）。
+- **#73**：代理 / IP / DNS 等 benign 话题不再误触网络范围校验（`net-scope.js`）。
 - **#74**：自定义提示词持久化——`resolveInjectText` 读 `prompt-inject.md`，UI 保存走 `saveOverrideContent`，启动 `ensureOperatorBody`。
 - **极简**：#80 保持官方 persistent-shell；UI 选 minimal 以 `agent-preset/selected` 为准（不再被会话头 `standard` 误导）；`adaptInjectForMinimalPreset` 对齐 shell-only 工具表。
 - **拒答续跑**：`refusal-recover` 识别「我不做 / 不参与」等句式。
@@ -279,9 +279,9 @@
 - 版本 **1.1.60**。
 - **极简 / PTC**：与标准同一任务却被拦，多半是 preset 里 `run_code`、沙箱、plan 文案未洗净，或内置 minimal 缺 `agent-instructions`。本版反转 #60/#61/#63，minimal 补插件（#26）。**完全退出 → 应用 → 重启 → 新开对话** 后再测。
 - **回退 → 重新发送**：「回退一次 / 回退上一轮」留在当前对话；已发送句回到输入框，本轮助手输出与 todo 撤掉。**1.1.60** 起按**当前轮**定位，多轮后不会又退到第一条用户消息（#74/#75 + `lib/rewind.js`）。
-- **应用 / 重启**：用户点应用、重启时写入 client 包，避免误报「清洗没有完成，已取消重启」。
+- **应用 / 重启**：用户点应用、重启时写入 client 包，避免误报「适配未完成，已取消重启」。
 - 默认提示词从 `default-prompt-inject.md` **重新加密**进 `asset-table.js`；运行时只读加密槽。
-- **#66** Windows `app.asar` 无 JScript 时 PowerShell 换包；**#67** `dsh.cmd` 解包路径；**#69** 演练台 `position:fixed`；**#71** assemble 守卫幂等；**#70** 技能路径按本机 OS 判定；**#68** 文档改为 `desktop` profile + `.tar.gz`（Hub 一键仍走 git，见 README）。
+- **#66** Windows `app.asar` 无 JScript 时 PowerShell 换包；**#67** `dsh.cmd` 解包路径；**#69** 工作台 `position:fixed`；**#71** assemble 守卫幂等；**#70** 技能路径按本机 OS 判定；**#68** 文档改为 `desktop` profile + `.tar.gz`（Hub 一键仍走 git，见 README）。
 
 ## English
 
@@ -297,7 +297,7 @@
 ## 中文
 
 - 版本升级到 1.1.59。
-- 点应用后不再因为宿主路径或旧标记对不上，就报「清洗没有写进当前宿主」（#65）。
+- 点应用后不再因为宿主路径或旧标记对不上，就报「补丁未写入当前宿主」（#65）。
 - `resources\app\node_modules` 和 `resources\app\dsh\node_modules` 都认。原文里已经没有官方身份句、也没有丢掉注入的写法时，不再要求那两条标记。
 - complete 段补丁同时认 tab 和空格。
 
@@ -315,7 +315,7 @@
 - 版本升级到 1.1.58。
 - 打开、应用、重启都会挂上提示词。磁盘上有正文就用磁盘，没有就用规则集，再没有就用内置默认，不用再点保存。
 - 启动不再在页面发出之后改写前端 client.js，避免输入框因模块版本号对不上而消失（#63）。
-- macOS / Linux 已解包桌面端点应用后会退出并重新打开；清洗标记两种写法都认（#64）。
+- macOS / Linux 已解包桌面端点应用后会退出并重新打开；补丁标记两种写法都认（#64）。
 
 ## English
 
@@ -330,15 +330,15 @@
 
 - 版本升级到 1.1.57。
 - 应用并重启后，设置框里的提示词直接挂到系统段；框空则用当前规则集。两者都空就停下来要求输入。
-- 创造、PTC、极简、unrestricted、梁神与标准模式一样清掉拦截和禁止，并保住各自的工具流程。
-- 演练授权按本机目录保存，更新后不用重授权；卸载成功后才清掉。空的环境初始化不再当成已配置。
+- 创造、PTC、极简、宽松预设、梁神与标准模式一致应用默认策略配置，并保住各自的工具流程。
+- 工作台确认状态按本机目录保存，更新后不用重授权；卸载成功后才清掉。空的环境初始化不再当成已配置。
 - 官方 Messages 请求的 system 字段改用当前系统提示，不再钉住第一条。
 
 ## English
 
 - Version 1.1.57.
 - After Apply and restart, the settings-box prompt is hung on the system section. An empty box uses the active rule set. If both are empty, Apply stops and asks for a prompt.
-- Cordis, PTC, minimal, unrestricted, and Liangshen clear intercepts and bans the same way standard does, and keep their own tools.
+- Cordis, PTC, minimal, relaxed preset, and Liangshen align host defaults the same way standard does, and keep their own tools.
 - Drill authorization is stored in this install and survives updates. It is cleared only after uninstall succeeds. An empty environment init is no longer treated as configured.
 - The official Messages request system field uses the current system prompt instead of the first snapshot.
 
@@ -348,14 +348,14 @@
 
 - 版本升级到 1.1.56。
 - 应用按设置框、当前规则集、官方系统提示词的顺序选用。空框且没有规则时停下来要求输入，不再把内置默认写进磁盘。
-- 清洗和演练台跟随 DSH 主题的透明玻璃，去掉手动换色。
+- 适配页与工作台跟随 DSH 主题的透明玻璃，去掉手动换色。
 - 说明只保留官方 Web 和官方桌面。
 
 ## English
 
 - Version 1.1.56.
 - Apply uses the settings box, then the active rule set, then the official system prompt. An empty box with no rules asks for a prompt and does not write the built-in default to disk.
-- 清洗 and the drill console use transparent glass that follows the DSH theme. The manual theme switch is gone.
+- The adaptation tab and workspace panel use transparent glass that follows the DSH theme. The manual theme switch is gone.
 - Docs keep official Web and the official desktop only.
 
 # 1.1.55
@@ -397,7 +397,7 @@
 - 版本升级到 1.1.53。
 - 修复点「应用」后无限重启（#59 / #60 / #61）：tarball 安装没有 `installed-rev`、或 `applied.json` 空 sha 时，启动不再反复 reapply+restart；对齐后不再空转重启，并加冷却。
 - web 自愈重启不再自动弹浏览器，关窗后不会再被反复拉起新窗口（#59 / #61）。
-- 空 sha 只在非密封、且清洗标记还在（或找不到插件根）时补戳，避免冲掉密封宿主自愈（#56 / #57）。
+- 空 sha 只在非密封、且补丁标记还在（或找不到插件根）时补戳，避免冲掉密封宿主自愈（#56 / #57）。
 - 市场安装：`package.json` 标明优先 tar.gz/zip，避免 Hub 退回 `git ls-remote` 失败（#58）。
 
 ## English
@@ -485,8 +485,8 @@
 ## 中文
 
 - 版本升级到 1.1.48。
-- 修复红队指挥「只派活」约束被组装时误删，导致不派 subagent；预设在 Agent Teams 下强制重开 classic subagent。
-- 增加按任务选用 skill/MCP 的协议（先读目录，再按任务调用；子代理与红队同样）；不改官方注册与工具面。
+- 修复扩展预设主代理「只派活」约束被组装时误删，导致不派 subagent；预设在 Agent Teams 下强制重开 classic subagent。
+- 增加按任务选用 skill/MCP 的协议（先读目录，再按任务调用；子代理与扩展预设同样）；不改官方注册与工具面。
 - 子代理 maxDepth 适配 0.2 无 default 的 schema，补回默认 10。
 
 ## English
@@ -501,7 +501,7 @@
 ## 中文
 
 - 版本升级到 1.1.47。
-- 演练台「环境适配」接通 `platformConfigGet` / `Save` / `AssignToolkit`，修复 `unknown op: platformConfigGet`，工具路径与 FOFA/VPS 配置可正常读写。
+- 工作台「环境适配」接通 `platformConfigGet` / `Save` / `AssignToolkit`，修复 `unknown op: platformConfigGet`，工具路径与 FOFA/VPS 配置可正常读写。
 - 技能库目录探测增加 `$DSH_HOME/redteam/skills`，Windows 用 `homedir()` 回退，不再只信空的 `HOME`。
 - 知识库优先使用环境适配里的 nuclei 模板路径；空库时显示本机 `knowledge.db` 路径，避免误判成接口挂了。
 - 首次安装弹出用户须知：说明用途、免费开源、GitHub 仓库地址；声明背着作者营利将追究法律责任，并提示禁止违法用途。确认后本机不再弹出。

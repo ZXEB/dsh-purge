@@ -1,6 +1,6 @@
 # 适配记录：1.1.71 → 1.1.76（dsh 0.2.2-rc.5）
 
-本文件记录适配**改了什么、为什么改、怎么验证的**。覆盖补丁锚点、运行期接口与红队预设组合。
+本文件记录适配**改了什么、为什么改、怎么验证的**。覆盖补丁锚点、运行期接口与扩展预设组合。
 
 ---
 
@@ -231,7 +231,7 @@ catch (err) { console.warn(...); return { sections: [], contexts: [], tools: [] 
 
 ---
 
-## 9. 第五轮（1.1.76）：适配 dsh `0.2.2-rc.5`（补丁锚点 + 运行期 + 演练台预设）
+## 9. 第五轮（1.1.76）：适配 dsh `0.2.2-rc.5`（补丁锚点 + 运行期 + 扩展预设）
 
 全量比对 npm `0.2.2-rc.3` → `0.2.2-rc.5` 全部 332 个 `@deepseek-ai/dsh*` 包及 `docs/upgrade-guide`（含 `@earendil-works/pi-ai@1.6.0`），发现 rc.3 → rc.5 有 14 个包改动（核心变化：`dsh-llm` / `dsh-llm-deepseek` 新增 `CONTENT_REFUSED` 错误码、`dsh-base` / `dsh-web` / `dsh-tool-web` 将 DeepSeek 模型默认搜索切换为按路由自动选择），同时补齐了前几轮未覆盖的 0.2.1–0.2.2 运行期与锚点缺口。
 
@@ -239,7 +239,7 @@ catch (err) { console.warn(...); return { sections: [], contexts: [], tools: [] 
 
 | 模块 / 条目 | 问题 | 处理 |
 |---|---|---|
-| `presets/redteam/agent.cordis.yml` & `lib/redteam/index.js` | `0.2.1+` 删除了 `@deepseek-ai/dsh-tool-subagent-control/list-agents` 子路径导出，且 `dsh-tool-subagent` 遇到 `toolFilter` 会直接抛错、移除了 `backgroundMode`、将 `modelSelectionSettings` 改为 `modelSelection` + `modelDiscovery`，导致红队预设在 `0.2.2` 上挂载失败（`broken`） | 移除 `tool-subagent-list-agents`、`toolFilter`、`backgroundMode` 与已下线的 `workflow-worker-thread` 行，迁移为 `modelSelection: true` + `modelDiscovery: true`（保留 `maxDepth: 1` 叶子约束）；`repairDelegation()` 增加就地自愈，平滑修复已有用户预设并保留自定义人设 |
+| `presets/redteam/agent.cordis.yml` & `lib/redteam/index.js` | `0.2.1+` 删除了 `@deepseek-ai/dsh-tool-subagent-control/list-agents` 子路径导出，且 `dsh-tool-subagent` 遇到 `toolFilter` 会直接抛错、移除了 `backgroundMode`、将 `modelSelectionSettings` 改为 `modelSelection` + `modelDiscovery`，导致扩展预设在 `0.2.2` 上挂载失败（`broken`） | 移除 `tool-subagent-list-agents`、`toolFilter`、`backgroundMode` 与已下线的 `workflow-worker-thread` 行，迁移为 `modelSelection: true` + `modelDiscovery: true`（保留 `maxDepth: 1` 叶子约束）；`repairDelegation()` 增加就地自愈，平滑修复已有用户预设并保留自定义人设 |
 | `lib/redteam/tools.js` & `lib/redteam/ui.js` | `0.2.1-rc.2` 删除了 `ctx.subagents.listChildren()`，导致 `redteam_agent_slot` 并发闸门与面板运行态统计在 `0.2.2` 上不可用 | 兼容回退到 `ctx.subagents.listDescendants()`（旧版宿主保留 `listChildren()` 优先），兼容 `name` 字段展示 |
 | `lib/continue-retry.js` | `0.2.2-rc.4/rc.5` 将 DeepSeek 流式 `stop_reason: "refusal"` 错误码从 `MALFORMED_RESPONSE` 改为 `CONTENT_REFUSED`（非重试类），原 `PERMANENT_CODES` 未覆盖，导致无意义重试 | 将 `CONTENT_REFUSED` 及 `0.2.2` 确定性不可重试码（`ACCOUNT_SIGN_IN_REQUIRED`、`ACCOUNT_TOKEN_INVALID`、`CLIENT_UPGRADE_REQUIRED`、`MODEL_UNSUPPORTED`、`UNKNOWN_MODEL`、`UNSUPPORTED_CONTENT`、`UNSUPPORTED_OPTION`、`UNSUPPORTED_REASONING_EFFORT`、`TOOL_ACTIVATION_FAILED`）加入 `PERMANENT_CODES` |
 | `#32` `WEB_SURFACE_IDENTITY_NEUTRAL` | `0.2.2` `dsh-web-app` 将环境变量描述改为 `Advertised URL of the DeepSeek Harness Web GUI serving this session.` | 追加 0.2.2 锚点，`#32`（及关联 `#53`）从 `skipped` 恢复为 `applied` |
@@ -250,9 +250,9 @@ catch (err) { console.warn(...); return { sections: [], contexts: [], tools: [] 
 
 | 检查 | 结果 |
 |---|---|
-| 实机 Windows 桌面端 `0.2.2-rc.5` 解包与 `reapplyInstalled` | applied **73** / pending **0** / failed **0**（含 `#40`、`#32`、`#56`、`#77`、`#57`）；49 个补丁目标 JS `node --check` 全过，真实 `0.2.2-rc.5` 宿主启动 E2E 全通（`/dsh-purge/status`、`/redteam/api`、红队预设 `registered / broken: null`）；同时修复 `lib/reapply.js` 首次解包后二次重复解包 `app.asar` |
+| 实机 Windows 桌面端 `0.2.2-rc.5` 解包与 `reapplyInstalled` | applied **73** / pending **0** / failed **0**（含 `#40`、`#32`、`#56`、`#77`、`#57`）；49 个补丁目标 JS `node --check` 全过，真实 `0.2.2-rc.5` 宿主启动 E2E 全通（`/dsh-purge/status`、`/redteam/api`、扩展预设 `registered / broken: null`）；同时修复 `lib/reapply.js` 首次解包后二次重复解包 `app.asar` |
 | 语法与幂等（`0.2.2-rc.5`） | 改写 54 个文件，全部 `node --check` 通过（**0 语法错误**）；apply 1 次与 3 次逐字节一致（**0 差异**） |
 | 向下兼容（`0.2.2-rc.3` 51 包基线） | applied **69**（较 v1.1.75 的 65 新增 `#32` `#53` `#56` `#77`）/ skipped **2**（`#40` `#80`），**0 回归**、**0 语法错误** |
 | 压缩版回退逻辑功能测试 | 从补丁后的 `dsh-client-ui-conversation/lib/client.js` 抽出 `isRewindMarker` / `rewindVisibleEntries` 实测：准确隐藏被回退轮次与标记、保留前序轮次与系统消息 |
-| 红队预设与自愈回归 | 随包 `presets/redteam/agent.cordis.yml` 与就地修复后的旧版用户预设均通过 `readPresetDefinition()` 校验、保留自定义人设且二次运行幂等；`redteam_agent_slot` / `ui` 在 `listDescendants` 与 `listChildren` 两种宿主形态下均通过 |
+| 扩展预设与自愈回归 | 随包 `presets/redteam/agent.cordis.yml` 与就地修复后的旧版用户预设均通过 `readPresetDefinition()` 校验、保留自定义人设且二次运行幂等；`redteam_agent_slot` / `ui` 在 `listDescendants` 与 `listChildren` 两种宿主形态下均通过 |
 | 既有兼容测试（`_compat-test.mjs`） | 21 项全通过；`continue-retry` 新错误码测试全通过 |

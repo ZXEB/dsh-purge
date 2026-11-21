@@ -1,3 +1,25 @@
+# 1.1.76
+
+## 中文
+
+- 版本 **1.1.76**，`dshTarget` 升到 **`0.2.2-rc.5`**（npm `latest` / `next` 及桌面端 `nightly` 最新版）。
+- 演练台预设适配 `0.2.1+` / `0.2.2-rc.5` 子代理配置架构：移除已删除的子路径 `@deepseek-ai/dsh-tool-subagent-control/list-agents`、会直接抛错的 `toolFilter`、已移除的 `backgroundMode` 与 `workflow-worker-thread`，将 `modelSelectionSettings` 迁移为 `modelSelection` + `modelDiscovery`（保留 `maxDepth: 1` 叶子约束）；`repairDelegation()` 支持就地自动修复已有用户预设且保留自定义人设。
+- 修复 `lib/redteam/tools.js` 与 `lib/redteam/ui.js` 对已移除 `ctx.subagents.listChildren()` 的依赖：在 `0.2.1-rc.2+` 上回退到 `ctx.subagents.listDescendants()`，同时保留旧版宿主兼容。
+- 适配 `0.2.2-rc.4/rc.5` 新增的 `CONTENT_REFUSED` 错误码：将其及 `0.2.2` 确定性不可重试码加入 `lib/continue-retry.js` 的 `PERMANENT_CODES`，避免内容安全拒答或配置错误反复重试。
+- 恢复 5 项此前在 0.2.2 失效/跳过的补丁锚点：`#32`（`dsh-web-app` 的 `Advertised URL` 文案）、`#40`（`0.2.2+` `dsh-system-prompt` 新增 `tools` 与 `requiredContexts` 后的完整提示词保注入锚点，解决桌面端首次解包清洗触发 `hostCleanMarkersPresent` 回滚）、`#56` 与 `#77`（压缩版 `dsh-client-ui-conversation/lib/client.js` 回退隐藏逻辑）、`#57`（`@earendil-works/pi-ai@1.3+/1.6+` `openai-responses-shared.js` 的 `instructionRole` 变量名）。
+- 修复 `lib/reapply.js` 在官方桌面端首次解包升级时因 `unpacked-asar.json` 尚未落盘而重复解包 `app.asar` 一次的问题。
+- 验证：真实 Windows 桌面端 `0.2.2-rc.5` 升级解包实测 applied **73** / pending **0** / failed **0**，49 个补丁目标 JS 语法全过，真实 `0.2.2-rc.5` 宿主启动加载全部插件且红队预设 `registered`（`broken: null`）；`0.2.2-rc.3` 向下兼容 0 回归。
+
+## English
+
+- **1.1.76**; `dshTarget` bumped to **`0.2.2-rc.5`** (latest on npm `latest`/`next` and desktop `nightly`).
+- Migrated `presets/redteam/agent.cordis.yml` to the `0.2.1+` / `0.2.2-rc.5` subagent schema: removed retired `tool-subagent-list-agents` (`/list-agents` subpath), throwing `toolFilter`, removed `backgroundMode` and `workflow-worker-thread`, and replaced `modelSelectionSettings` with `modelSelection` + `modelDiscovery` (keeping `maxDepth: 1`); added non-destructive in-place migration in `repairDelegation()`.
+- Fixed `lib/redteam/tools.js` and `lib/redteam/ui.js` for removed `ctx.subagents.listChildren()` by falling back to `ctx.subagents.listDescendants()` on `0.2.1-rc.2+`.
+- Handled new `0.2.2-rc.4/rc.5` `CONTENT_REFUSED` (and other deterministic non-retryable codes) in `lib/continue-retry.js` `PERMANENT_CODES`.
+- Restored 5 patch anchors on 0.2.2: `#32` (`Advertised URL`), `#40` (`0.2.2+` `dsh-system-prompt` `tools` + `requiredContexts` return shape, fixing `hostCleanMarkersPresent()` rollback on fresh desktop unpack), `#56` & `#77` (minified `dsh-client-ui-conversation/lib/client.js`), and `#57` (`@earendil-works/pi-ai@1.3+/1.6+` `instructionRole` in `openai-responses-shared.js`).
+- Fixed `lib/reapply.js` double-extracting `app.asar` during fresh official desktop upgrade before `unpacked-asar.json` is written.
+- Verified live on Windows Desktop `0.2.2-rc.5`: **73** applied, **0** pending, **0** failed, 49/49 patched target JS files pass `node --check`, live host boot passes with redteam preset `registered` (`broken: null`); **0** regressions on `0.2.2-rc.3`.
+
 # 1.1.73
 
 ## 中文

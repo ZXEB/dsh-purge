@@ -4,12 +4,12 @@
 
 <h1 align="center">dsh-purge — DeepSeek Harness 本地运行时适配插件</h1>
 
-<p align="center"><strong>适配版 v1.1.73 · 对应 dsh 0.2.2-rc.3</strong></p>
+<p align="center"><strong>适配版 v1.1.76 · 对应 dsh 0.2.2-rc.5</strong></p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-1.1.73-1a73e8?style=flat" alt="version">
+  <img src="https://img.shields.io/badge/version-1.1.76-1a73e8?style=flat" alt="version">
   <img src="https://img.shields.io/badge/license-MIT-65a30d?style=flat" alt="MIT">
-  <img src="https://img.shields.io/badge/dsh-0.2.2--rc.3-blue" alt="dsh 0.2.2">
+  <img src="https://img.shields.io/badge/dsh-0.2.2--rc.5-blue" alt="dsh 0.2.2">
   <img src="https://img.shields.io/badge/Node.js-%3E%3D18-339933?logo=node.js&logoColor=fff" alt="Node.js">
 </p>
 
@@ -19,7 +19,7 @@
 
 > 本包是 `dsh-purge` 的**兼容性适配重建版**，用于给自己电脑上已安装的官方 DeepSeek Harness 做本地配置与产物层适配。原仓库与其 npm 包均已下线，因此**按包名安装（`dsh plugin add dsh-purge`）不可用**，请按本文第四节的 tarball / 本地目录 / 手动三种方式安装。
 >
-> 本版本针对 **dsh 0.2.2-rc.3** 重新校准了补丁锚点，适配细节见 [ADAPTATION-NOTES.md](ADAPTATION-NOTES.md)。
+> 本版本针对 **dsh 0.2.2-rc.5** 重新校准了补丁锚点与运行期接口，适配细节见 [ADAPTATION-NOTES.md](ADAPTATION-NOTES.md)。
 >
 > 要在**另一台电脑**上装：直接看 [INSTALL-OTHER-PC.md](INSTALL-OTHER-PC.md)（拷贝 zip → 解压到英文路径 → 跑 `install.ps1`）。
 
@@ -85,7 +85,7 @@
 
 | 项 | 要求 |
 |---|---|
-| dsh | **0.2.2-rc.3**（本包 `dshTarget`）；0.2.0 / 0.2.1 亦可用，个别条目会显示 `skipped` |
+| dsh | **0.2.2-rc.5**（本包 `dshTarget`）；0.2.0 / 0.2.1 / 0.2.2-rc.1~rc.4 亦可用，个别条目会显示 `skipped` |
 | 宿主 | 官方桌面 EXE（profile `desktop`）或官方 `dsh web`（profile `web`） |
 | Node.js | **≥ 18**；Windows 下要「无闪窗」需要 **≥ 22** |
 | 包管理器 | 用 dsh 自带的 pnpm（`dsh plugin` 会调用它），不必单独装 |
@@ -379,7 +379,7 @@ flowchart TD
 
 提示词段来源优先级：`prompt-inject.md`（非空）→ 当前目录被勾选且非空的本地 md → 插件内置默认值；再由 workspace baseline 策略（`strict` / `fallback` / `always`）决定是否保留 DSH 的 baseline 段。Skill **不进**注入段，也不顶替提示词。
 
-补丁匹配是**纯文本锚点**：锚点对不上（上游改了写法）就判 `skipped` 并保持原样，不会产生半改文件；本适配版已按 dsh 0.2.2-rc.3 的实际产物逐条校准（见 [ADAPTATION-NOTES.md](ADAPTATION-NOTES.md)）。
+补丁匹配是**纯文本锚点**：锚点对不上（上游改了写法）就判 `skipped` 并保持原样，不会产生半改文件；本适配版已按 dsh 0.2.2-rc.5 的实际产物逐条校准（见 [ADAPTATION-NOTES.md](ADAPTATION-NOTES.md)）。
 
 ---
 
@@ -422,10 +422,10 @@ dsh-purge --uninstall     # 或 /purge uninstall，或面板「适配 → 卸载
 看它给出的 `logPath`。常见是 profile JSON 写坏、`file:` 路径不对。
 
 **4. 报版本不匹配（incompatible）**
-本包 `dshTarget` 是 `0.2.2-rc.3`。确认 dsh 在 0.2.x；跨小版本可用：
+本包 `dshTarget` 是 `0.2.2-rc.5`。确认 dsh 在 0.2.x；跨小版本可用：
 
 ```sh
-dsh plugin --profile web allow-version dsh-purge@1.1.73 --dsh-version <你的精确版本> --accept-risk
+dsh plugin --profile web allow-version dsh-purge@1.1.76 --dsh-version <你的精确版本> --accept-risk
 ```
 
 **5. 桌面端 `dsh plugin --profile desktop ...` 直接报错**
@@ -454,12 +454,13 @@ dsh plugin --profile web allow-version dsh-purge@1.1.73 --dsh-version <你的精
 
 | 插件版本 | 适配 dsh | 说明 |
 |---|---|---|
-| **1.1.73**（本适配版） | **0.2.2-rc.3** | npm `next` 通道最新版；锚点已按 rc.3 产物校准 |
-| 1.1.73 同版向下 | 0.2.2-rc.2 / rc.1、0.2.1-rc.x、0.2.0-rc.2 | 状态探测 **0 回归**，旧写法锚点仍保留 |
-| 1.1.72 | 0.2.2-rc.1 | 首轮适配；rc.3 上有 5 条锚点失效 |
+| **1.1.76**（本适配版） | **0.2.2-rc.5** | 适配 rc.5 全部 332 包 + `pi-ai@1.6`；补齐红队预设/子代理接口/`CONTENT_REFUSED`，恢复 `#32` `#56` `#77` `#57` |
+| 1.1.76 同版向下 | 0.2.2-rc.1~rc.4、0.2.1-rc.x、0.2.0-rc.2 | 状态探测 **0 回归**，旧写法锚点与 `listChildren` 回退均保留 |
+| 1.1.75 | 0.2.2-rc.3 | 修复 `{{cwd}}` 变量缺失、组装兜底丢工具与 DSML 正文重试 |
+| 1.1.73–1.1.74 | 0.2.2-rc.3 | 锚点重校准 + 读前校验与 hooks 幂等修复 |
 | 1.1.71（上游镜像） | 0.2.0-rc.2 | 原仓库镜像版，0.2.2 上有 6 条锚点失效 |
 
-未命中项在面板里显示 `skipped`，只影响那一条，不会产生半改文件。已知在 0.2.2 全系常态 `skipped` 的是 `#32` `#40` `#53` `#56` `#77` `#80` `#88`（上游布局/前端产物差异，以及 0.1.5 专用兼容项）。
+未命中项在面板里显示 `skipped`，只影响那一条，不会产生半改文件。在 0.2.2 上应用后常态 `skipped` 仅剩 `#40`（0.1.5 专用兼容项）与 `#80`（旧版极简工具表回退项）。
 
 不适配的条目不会被盲改，只会 `pending` / `skipped`。
 

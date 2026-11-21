@@ -287,14 +287,10 @@
   isolate:
     workflowEngine: true
   config:
-    # 官方 experimental-agent-team-profile 会在 profile 层 disabled 掉同名行。
-    # 红队必须显式 disabled: false，否则只有 spawn_teammate，指挥按 subagent 派活会失败。
+    # dsh 0.2.1+ 已把 list_agents / wait_agent 合并进主入口，不再有 /list-agents 子路径导出。
+    # 红队显式 disabled: false，确保指挥始终能用原生 subagent 路径派活。
     - id: tool-subagent-control
       name: '@deepseek-ai/dsh-tool-subagent-control'
-      disabled: false
-
-    - id: tool-subagent-list-agents
-      name: '@deepseek-ai/dsh-tool-subagent-control/list-agents'
       disabled: false
 
     - id: tool-subagent
@@ -303,33 +299,20 @@
       config:
         provider: spawn
         toolName: subagent
-        modelSelectionSettings: true
-        backgroundMode: continuable
+        modelSelection: true
+        modelDiscovery: true
         # 子智能体是角色执行者（信息收集/资产梳理/漏洞发现/漏洞利用/内网渗透），**必须是叶子节点**：
-        # 靠提示词劝"不要再往下委派"是软的——模型完全可以无视。这里直接把委派工具从子会话的
-        # 工具目录里摘掉，子智能体连看都看不到 subagent / subagent_fork / workflow / ralph。
-        # maxDepth 同时收成 1 作为二道保险（默认 3 层太深，会白吃并发预算与上下文）。
+        # dsh 0.2.1+ 已移除 toolFilter（保留会直接抛错使预设 broken），由 maxDepth: 1 在运行时阻断再委派。
         maxDepth: 1
-        # 注意：不能 deny `subagent` —— 它是这一行自己注册的 scoped 工具，不在全局工具库里，
-        # 写进 deny 会让 tools.restrict() 校验失败、整个委派路径报 "unknown global tool"（v0.8.0 踩过）。
-        # 子智能体拿不到 subagent_fork/workflow/ralph，加上 maxDepth: 1，实际已无派发能力。
-        toolFilter:
-          deny:
-            - subagent_fork
-            - workflow
-            - ralph
 
     # Fork omits model selection so provider/model stay equal to the parent and
-    # the inherited history remains eligible for KV Cache reuse. This preset
-    # keeps fork continuable; parent and child inherit the same messaging tool,
-    # while the parent id and return guidance follow the inherited history.
+    # the inherited history remains eligible for KV Cache reuse.
     - id: tool-subagent-fork
       name: '@deepseek-ai/dsh-tool-subagent'
       disabled: false
       config:
         provider: fork
         toolName: subagent_fork
-        backgroundMode: continuable
 
     # Production dsh does not install these optional providers. Install the
     # matching Bundle in this Profile and restart the Host, then copy this
@@ -341,7 +324,6 @@
       config:
         provider: codex
         toolName: subagent_codex
-        backgroundMode: one-shot
         maxDepth: provider-managed
 
     - id: tool-subagent-claude-code
@@ -350,15 +332,7 @@
       config:
         provider: claude-code
         toolName: subagent_claude_code
-        backgroundMode: one-shot
         maxDepth: provider-managed
-
-    - id: workflow-worker-thread
-      name: '@deepseek-ai/dsh-workflow-worker-thread'
-      # web 配置通常不装 worker-thread 引擎；未启动会导致整个预设 broken、模式下拉被过滤。
-      disabled: true
-      config:
-        provider: spawn
 
     - id: workflow-ptc
       name: '@deepseek-ai/dsh-workflow-ptc'

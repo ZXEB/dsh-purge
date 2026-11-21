@@ -4,7 +4,7 @@
 
 <h1 align="center">dsh-purge — local runtime adaptation plugin for DeepSeek Harness</h1>
 
-<p align="center"><strong>Adapted build v1.1.73 · targets dsh 0.2.2-rc.3</strong></p>
+<p align="center"><strong>Adapted build v1.1.76 · targets dsh 0.2.2-rc.5</strong></p>
 
 <p align="center">
   <a href="README.md">中文</a> | <a href="README.en.md">English</a>
@@ -12,7 +12,7 @@
 
 > This is a **compatibility rebuild** of `dsh-purge`. It adapts the default values and prompt segments of an officially installed DeepSeek Harness **on your own machine**. The original repository and its npm package are gone, so installing by package name (`dsh plugin add dsh-purge`) does not work — use one of the local installation paths below.
 >
-> The patch anchors were re-calibrated against **dsh 0.2.2-rc.3**; see [ADAPTATION-NOTES.md](ADAPTATION-NOTES.md) for the per-entry record.
+> The patch anchors and runtime hooks were calibrated against **dsh 0.2.2-rc.5**; see [ADAPTATION-NOTES.md](ADAPTATION-NOTES.md) for the per-entry record.
 
 ---
 
@@ -41,7 +41,7 @@ Path detection order: `$DSH_HOME` → `.dsh` next to the dsh launcher → `~/.ds
 
 | Item | Requirement |
 |---|---|
-| dsh | **0.2.2-rc.3** (`dshTarget`); 0.2.0 / 0.2.1 also work, a few entries show `skipped` |
+| dsh | **0.2.2-rc.5** (`dshTarget`); 0.2.0 / 0.2.1 / 0.2.2-rc.1~rc.4 also work, a few entries show `skipped` |
 | Host | Official desktop EXE (profile `desktop`) or official `dsh web` (profile `web`) |
 | Node.js | **≥ 18** (`≥ 22` for no console flash on Windows) |
 | Package manager | The pnpm bundled with dsh (called by `dsh plugin`); no separate install needed |
@@ -165,7 +165,7 @@ Edit the `dsh-purge` entry in `$DSH_HOME/profiles/<web|desktop>/cordis.patch.yml
 
 On apply (or startup self-check): if an entry is already in effect it is skipped (idempotent); otherwise the target file is backed up as `<file>.dshpurge.bak`, the patch table is applied, the `dsh` shim is written, and the bundled prompt segment is mounted.
 
-Matching is **plain-text anchoring**. When upstream rewording invalidates an anchor, the entry reports `skipped` and the file is left untouched — no half-patched output. This build re-validated every anchor against the real dsh 0.2.2-rc.3 artifacts and syntax-checked the patched output.
+Matching is **plain-text anchoring**. When upstream rewording invalidates an anchor, the entry reports `skipped` and the file is left untouched — no half-patched output. This build re-validated every anchor and runtime hook against the real dsh 0.2.2-rc.5 artifacts and syntax-checked the patched output.
 
 ---
 
@@ -181,12 +181,13 @@ Matching is **plain-text anchoring**. When upstream rewording invalidates an anc
 
 | Plugin | dsh | Note |
 |---|---|---|
-| **1.1.73** (this build) | **0.2.2-rc.3** | newest on npm `next`; anchors calibrated against rc.3 artifacts |
-| 1.1.73 downward | 0.2.2-rc.2 / rc.1, 0.2.1-rc.x, 0.2.0-rc.2 | status probe shows **0 regressions**; older-format anchors are kept |
-| 1.1.72 | 0.2.2-rc.1 | first adaptation round; 5 anchors miss on rc.3 |
+| **1.1.76** (this build) | **0.2.2-rc.5** | calibrated against rc.5 + `pi-ai@1.6`; fixes redteam preset/subagent APIs/`CONTENT_REFUSED`, restores `#32` `#56` `#77` `#57` |
+| 1.1.76 downward | 0.2.2-rc.1~rc.4, 0.2.1-rc.x, 0.2.0-rc.2 | status probe shows **0 regressions**; legacy anchors and `listChildren` fallback kept |
+| 1.1.75 | 0.2.2-rc.3 | `{{cwd}}` compat, assemble error propagation, DSML native-tool guard |
+| 1.1.73–1.1.74 | 0.2.2-rc.3 | anchor recalibration + read-first & hooks idempotency fixes |
 | 1.1.71 (upstream mirror) | 0.2.0-rc.2 | 6 anchors miss on 0.2.2 |
 
-Misses surface as `skipped` for that entry only and never leave half-patched files. Entries that are normally `skipped` across 0.2.2: `#32` `#40` `#53` `#56` `#77` `#80` `#88` (upstream layout / front-end bundle differences, plus one 0.1.5-only compatibility entry).
+Misses surface as `skipped` for that entry only and never leave half-patched files. After applying on 0.2.2, only `#40` (0.1.5-only) and `#80` (legacy minimal toolset rollback) remain `skipped`.
 
 ---
 

@@ -1,6 +1,20 @@
-# 在另一台电脑上安装（迁移清单）
+# 在另一台电脑上安装（联网极简版 + 离线迁移清单）
 
-这份文件是给**另一台电脑**用的。本机不需要做任何操作。
+## 推荐：目标机有网络时（1 分钟装完，无需拷文件）
+
+1. 打开目标机的 DeepSeek Harness，进入 **「插件 → 发现 → 添加索引源」**（若无「发现」，先在「插件 → 实验性插件 → 更多」启用「自定义插件市场 / 自定义插件索引」）。
+2. 粘贴以下网址并保存：
+   ```text
+   https://zxeb.github.io/dsh-purge/index.json
+   ```
+3. 搜索 **dsh-purge** 并点击 **「安装」**，重启 DSH 后在面板点击 **「适配 → 应用」** 即可。
+
+也可以在 **「插件 → 添加插件」** 直接粘贴 `.tgz` 链接：
+`https://github.com/ZXEB/dsh-purge/releases/download/v1.1.77/dsh-purge-1.1.77.tgz`
+
+---
+
+## 以下仅用于目标机完全离线（无法访问 GitHub）的场景
 
 ---
 
@@ -17,18 +31,18 @@
 
 ---
 
-## 1. 把压缩包拷过去
+## 1. 把离线安装包拷过去
 
-把这个文件拷到目标机（U 盘 / 局域网 / 网盘都行）：
+从 [GitHub Releases](https://github.com/ZXEB/dsh-purge/releases/latest) 下载下面任意一个文件拷到目标机（U 盘 / 局域网 / 网盘都行）：
 
-```
-dsh-purge-1.1.73-dsh0.2.2rc3.zip
-```
+- **方式 A（推荐，最省事）**：下载 `dsh-purge-1.1.77.tgz` 放到纯英文路径（例如 `D:\dsh-plugins\dsh-purge-1.1.77.tgz`），直接执行：
+  ```powershell
+  dsh plugin --profile desktop add D:\dsh-plugins\dsh-purge-1.1.77.tgz
+  ```
+- **方式 B（使用本地脚本）**：下载 `dsh-purge-1.1.77.zip`，解压到**纯英文路径**，例如：
 
-解压到**纯英文路径**，例如：
-
-```
-D:\dsh-plugins\dsh-purge-0.2.2\
+```text
+D:\dsh-plugins\dsh-purge\
     ├─ package.json
     ├─ README.md
     ├─ check.ps1        ← 装前/装后都能跑的只读自检
@@ -134,7 +148,7 @@ node D:\dsh-plugins\dsh-purge\bin\dsh-purge.js --apply
 powershell -ExecutionPolicy Bypass -File .\check.ps1 -Profile desktop
 ```
 
-`skipped` 的典型原因：目标机 dsh 版本与本包 `dshTarget`（`0.2.2-rc.3`）不同，那段原文对不上 —— 条目保持原样，不会产生半改文件，可以忽略。
+`skipped` 的典型原因：目标机 dsh 版本与本包 `dshTarget`（`0.2.2-rc.5`）不同，那段原文对不上 —— 条目保持原样，不会产生半改文件，可以忽略。
 `missing_file` 的典型原因：对应的可选第三方包（mnemon / liangshen 等）没装，同样不影响其余条目。
 
 ---
@@ -164,10 +178,3 @@ node D:\dsh-plugins\dsh-purge\bin\dsh-purge.js --uninstall
 | 装完没有 dsh-purge 按钮 | 装到了另一个 profile（Web / 桌面是两份 `DSH_HOME`）；或没重启；或只加了 `dependencies` 没加 `dsh.profile.bundles` |
 | 点「应用」后行为没变 | 补丁要重启后才加载，注入在新会话才生效：应用 → 等自动重启 → 新开一轮 |
 | 宿主更新后补丁没了 | `npm/pnpm` 覆盖了 `node_modules`。把 profile 配置里的 `autoApplyOnStart` 设为 `true`，或重跑一次 `--apply` |
-
----
-
-## 8. 这台机器（来源机）做了什么、没做什么
-
-- **做了**：把插件的补丁锚点按 dsh 0.2.2-rc.3 重新校准、改写了文档表述、打包。
-- **没做**：没有在你的这台机器上安装或应用任何补丁；所有验证都在 `D:\项目\DeepSeek_Harness测试\_adapt\` 下的临时 npm 安装里完成。

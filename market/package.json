@@ -1,0 +1,8 @@
+{
+  "name": "dsh-purge-market-validation",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@deepseek-ai/dsh-plugin-market-index": "0.2.2-rc.5"
+  }
+}

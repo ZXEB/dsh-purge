@@ -4,13 +4,13 @@
 
 <h1 align="center">dsh-purge — local runtime adaptation plugin for DeepSeek Harness</h1>
 
-<p align="center"><strong>Adapted build v1.1.76 · targets dsh 0.2.2-rc.5</strong></p>
+<p align="center"><strong>Adapted build v1.1.77 · targets dsh 0.2.2-rc.5</strong></p>
 
 <p align="center">
-  <a href="README.md">中文</a> | <a href="README.en.md">English</a>
+  <a href="README.md">中文</a> | <a href="README.en.md">English</a> | <a href="https://zxeb.github.io/dsh-purge/">Plugin Index</a>
 </p>
 
-> This is a **compatibility rebuild** of `dsh-purge`. It adapts the default values and prompt segments of an officially installed DeepSeek Harness **on your own machine**. The original repository and its npm package are gone, so installing by package name (`dsh plugin add dsh-purge`) does not work — use one of the local installation paths below.
+> This is a **compatibility rebuild** of `dsh-purge`. It adapts the default values and prompt segments of an officially installed DeepSeek Harness **on your own machine**. Supports **one-URL installation via DSH Custom Plugin Market** (`https://zxeb.github.io/dsh-purge/index.json`) and direct Release `.tgz` URLs, with **zero third-party npm runtime dependencies**.
 >
 > The patch anchors and runtime hooks were calibrated against **dsh 0.2.2-rc.5**; see [ADAPTATION-NOTES.md](ADAPTATION-NOTES.md) for the per-entry record.
 
@@ -41,73 +41,66 @@ Path detection order: `$DSH_HOME` → `.dsh` next to the dsh launcher → `~/.ds
 
 | Item | Requirement |
 |---|---|
-| dsh | **0.2.2-rc.5** (`dshTarget`); 0.2.0 / 0.2.1 / 0.2.2-rc.1~rc.4 also work, a few entries show `skipped` |
+| dsh | **0.2.2-rc.5** (`engines.dsh: >=0.2.0-rc.1 <0.3.0`; works across 0.2.0 / 0.2.1 / 0.2.2-rc.1~rc.5) |
 | Host | Official desktop EXE (profile `desktop`) or official `dsh web` (profile `web`) |
 | Node.js | **≥ 18** (`≥ 22` for no console flash on Windows) |
 | Package manager | The pnpm bundled with dsh (called by `dsh plugin`); no separate install needed |
-| Network | Not required — install from a local directory works offline |
+| Network & deps | **Zero third-party npm runtime dependencies**; supports online 1-URL install or offline `.tgz` / local folder install |
 
 ---
 
 ## 3. Install
 
-### 3.0 Pick the profile
+### 3.1 Option A — One-URL install in DSH UI (Custom Plugin Index, recommended)
 
-| You run | profile | Note |
-|---|---|---|
-| Official desktop EXE | `desktop` | Profile appears only after the client has been launched once; **quit it completely** before installing |
-| Official `dsh web` | `web` | Stop the running `dsh web` first |
+1. Open **Plugins → Discover → Add index source** in DSH. (If **Discover** is not shown, enable **Custom plugin index / market** under **Plugins → Experimental plugins → More** first.)
+2. Paste this URL and save:
 
-Find the `$DSH_HOME` you are actually using (a machine often has two):
+   ```text
+   https://zxeb.github.io/dsh-purge/index.json
+   ```
 
-```powershell
-$cands = @()
-if ($env:DSH_HOME) { $cands += $env:DSH_HOME }
-$cands += "$env:USERPROFILE\.dsh"
-$cands += @("$env:APPDATA\DeepSeek Harness\dsh-home", "$env:LOCALAPPDATA\DeepSeek Harness\dsh-home")
-$cands | Select-Object -Unique | Where-Object { $_ -and (Test-Path (Join-Path $_ "profiles")) }
-```
+3. Find **dsh-purge** (verify repository `ZXEB/dsh-purge`) and click **Install**.
 
-### 3.1 Option A — install from the local directory (recommended, offline)
+This plugin has **zero third-party npm dependencies** and requires no build script authorization.
 
-```powershell
-# Web host
-dsh plugin --profile web add D:\path\to\dsh-purge-0.2.2
+### 3.2 Option B — Direct `.tgz` URL via DSH UI or Official CLI
 
-# Desktop host (quit the desktop client first)
-dsh plugin --profile desktop add D:\path\to\dsh-purge-0.2.2
-```
+Paste the release `.tgz` URL into **Plugins → Add plugin**, or run via CLI (replace `web` with `desktop` for the Desktop app):
 
 ```sh
-dsh plugin --profile web add /path/to/dsh-purge-0.2.2
+dsh plugin --profile web add "https://github.com/ZXEB/dsh-purge/releases/download/v1.1.77/dsh-purge-1.1.77.tgz"
 ```
 
-Copy **the whole directory** (`lib/ client.js docs/ presets/ skills/ bin/`). `client.js` is the built side-panel bundle; without it you get the CLI only.
+### 3.3 Option C — Remote one-liner installer (with SHA256 verification)
 
-### 3.2 Option B — manual install (fallback)
-
-1. Copy this directory to `$DSH_HOME/plugins/dsh-purge` (the folder name and the `"name"` field in `package.json` must both be `dsh-purge`).
-2. In `$DSH_HOME/profiles/<web|desktop>/package.json`, add exactly two things: `"dsh-purge": "file:../../plugins/dsh-purge"` under `dependencies`, and `"dsh-purge"` at the end of `dsh.profile.bundles`.
-3. `cd` into that profile directory and run `pnpm install`. Success means `profiles/<web|desktop>/node_modules/dsh-purge/package.json` exists.
-
-### 3.3 One-shot script (Windows)
+**Windows (PowerShell 5.1 / 7):**
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\install.ps1 -Profile desktop
-powershell -ExecutionPolicy Bypass -File .\install.ps1 -Profile desktop -StatusOnly
+$Installer = Join-Path $env:TEMP ('dsh-purge-install-' + [guid]::NewGuid().ToString('N') + '.ps1')
+Invoke-WebRequest -UseBasicParsing -TimeoutSec 90 -Uri 'https://raw.githubusercontent.com/ZXEB/dsh-purge/master/scripts/install.ps1' -OutFile $Installer
+powershell -NoProfile -ExecutionPolicy Bypass -File "$Installer" -DryRun
+powershell -NoProfile -ExecutionPolicy Bypass -File "$Installer"
 ```
 
-A read-only pre-flight / post-install check (writes nothing):
+**macOS / Linux:**
+
+```sh
+TMP_DIR="$(mktemp -d)"
+curl -fsSL --connect-timeout 20 --max-time 90 "https://raw.githubusercontent.com/ZXEB/dsh-purge/master/scripts/install.sh" -o "$TMP_DIR/install.sh"
+sh "$TMP_DIR/install.sh" --dry-run
+sh "$TMP_DIR/install.sh"
+```
+
+### 3.4 Option D — Offline / local directory fallback
+
+Download `dsh-purge-1.1.77.tgz` (or `.zip`) from [GitHub Releases](https://github.com/ZXEB/dsh-purge/releases/latest) and run:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\check.ps1 -Profile desktop
+dsh plugin --profile desktop add D:\dsh-plugins\dsh-purge-1.1.77.tgz
 ```
 
-It reports the Node version, the dsh CLI, every `DSH_HOME` candidate, whether the profile is initialised, whether paths are ASCII-only, whether a plugin is already installed, and an applied/pending summary, ending with `RESULT: ready.` or the blocking items.
-
-### 3.4 If `dsh` is not on PATH
-
-The desktop build ships a CLI, usually at `<install dir>\resources\runtime\cli\bin\dsh.cmd`; it takes the same arguments.
+Or extract the zip to an ASCII-only folder and run `powershell -ExecutionPolicy Bypass -File .\install.ps1 -Profile desktop`. If `dsh` is not on PATH, use `<install dir>\resources\runtime\cli\bin\dsh.cmd`.
 
 ### 3.5 After installing
 
@@ -173,7 +166,7 @@ Matching is **plain-text anchoring**. When upstream rewording invalidates an anc
 
 - **Revert**: `dsh-purge --revert` (or `/purge revert`) restores every `<file>.dshpurge.bak` and removes the shim lines it wrote. `prompt-inject.md` is a user file and is kept.
 - **Uninstall**: `dsh-purge --uninstall` reverts first, then removes injected files, the rules store and the plugin registration.
-- **Upgrade**: replace the directory, reinstall, apply once. `autoApplyOnStart: true` covers `node_modules` being replaced.
+- **Upgrade**: update directly from the DSH Plugins page (when installed via the custom market index), install the new `.tgz` URL, or re-run `scripts/install.ps1` / `scripts/install.sh`, then restart and apply once. `autoApplyOnStart: true` covers `node_modules` being replaced.
 
 ---
 
@@ -181,13 +174,14 @@ Matching is **plain-text anchoring**. When upstream rewording invalidates an anc
 
 | Plugin | dsh | Note |
 |---|---|---|
-| **1.1.76** (this build) | **0.2.2-rc.5** | calibrated against rc.5 + `pi-ai@1.6`; fixes redteam preset/subagent APIs/`CONTENT_REFUSED`, restores `#32` `#56` `#77` `#57` |
+| **1.1.77** (this build) | **0.2.2-rc.5** (`>=0.2.0-rc.1 <0.3.0`) | adds official DSH format-1 custom market index (`https://zxeb.github.io/dsh-purge/index.json`), `.tgz` Release tarballs + `SHA256SUMS.txt`, cross-platform remote installers, and `engines.dsh` |
+| 1.1.76 | 0.2.2-rc.5 | calibrated against rc.5 + `pi-ai@1.6`; fixes redteam preset/subagent APIs/`CONTENT_REFUSED`, restores `#32` `#40` `#56` `#77` `#57`, fixes duplicate ASAR unpack |
 | 1.1.76 downward | 0.2.2-rc.1~rc.4, 0.2.1-rc.x, 0.2.0-rc.2 | status probe shows **0 regressions**; legacy anchors and `listChildren` fallback kept |
 | 1.1.75 | 0.2.2-rc.3 | `{{cwd}}` compat, assemble error propagation, DSML native-tool guard |
 | 1.1.73–1.1.74 | 0.2.2-rc.3 | anchor recalibration + read-first & hooks idempotency fixes |
 | 1.1.71 (upstream mirror) | 0.2.0-rc.2 | 6 anchors miss on 0.2.2 |
 
-Misses surface as `skipped` for that entry only and never leave half-patched files. After applying on 0.2.2, only `#40` (0.1.5-only) and `#80` (legacy minimal toolset rollback) remain `skipped`.
+Misses surface as `skipped` for that entry only and never leave half-patched files. After applying on 0.2.2 desktop, only `#80` (legacy minimal toolset fallback) and `#82` (legacy desktop fallback) remain `skipped`.
 
 ---
 

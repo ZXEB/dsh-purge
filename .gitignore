@@ -1,6 +1,12 @@
 # 不上传
 node_modules/
+market-dist/
+market/node_modules/
+market/package-lock.json
 *.tgz
+*.zip
+SHA256SUMS.txt
+current-release-notes.md
 npm-debug.log*
 *.log
 .DS_Store

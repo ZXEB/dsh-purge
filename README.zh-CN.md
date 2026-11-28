@@ -8,13 +8,13 @@
 >
 > 本文件仅为兼容旧链接与插件自更新时的文件清单而保留。
 
-- 环境要求：dsh **0.2.2-rc.5**（0.2.0 / 0.2.1 / 0.2.2-rc.1~rc.4 可用）、Node ≥ 18
-- 安装方式：本地目录（推荐，离线可用）、手动改 profile、`install.ps1` 一键脚本
-- 安装后三步：完全退出宿主 → 适配 → 应用 → 自动重启 → 新开会话
-- 其它：安装验证清单、目录结构、运行时文件、配置项、CLI 与聊天命令、更新/还原/卸载、FAQ、兼容性表
+- 环境要求：dsh **0.2.2-rc.5**（兼容 `>=0.2.0-rc.1 <0.3.0`）、Node ≥ 18
+- **最简安装（推荐）**：在 DSH「插件 → 发现 → 添加索引源」粘贴 `https://zxeb.github.io/dsh-purge/index.json`，搜索 **dsh-purge** 点击安装
+- **直链安装**：在 DSH「插件 → 添加插件」或 CLI 填入 Release `.tgz` 链接
+- 安装后三步：完全退出宿主 → 打开 dsh-purge → 适配 → 应用 → 自动重启 → 新开会话
 - 适配记录：[ADAPTATION-NOTES.md](ADAPTATION-NOTES.md)
 
-```powershell
-# 最短路径：装到桌面宿主（把路径换成实际目录）
-dsh plugin --profile desktop add D:\path\to\dsh-purge-0.2.2
+```sh
+# 命令行直链安装（桌面端将 web 换成 desktop）
+dsh plugin --profile web add "https://github.com/ZXEB/dsh-purge/releases/download/v1.1.77/dsh-purge-1.1.77.tgz"
 ```

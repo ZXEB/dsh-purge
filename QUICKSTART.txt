@@ -1,98 +1,53 @@
 ﻿========================================================================
- dsh-purge 1.1.76  快速开始（给另一台电脑）
- 适配 dsh 0.2.2-rc.5（0.2.0 / 0.2.1 / 0.2.2-rc.1~rc.5 均可）
+ dsh-purge 1.1.77  快速开始
+ 适配 dsh 0.2.2-rc.5（兼容 >=0.2.0-rc.1 <0.3.0）
 ========================================================================
 
-【你在本机要拿走的，只有一个文件】
+【最简单的方式：一个网址在 DSH 界面一键安装（推荐）】
 
-  D:\项目\DeepSeek_Harness测试\dsh-purge-1.1.73-dsh0.2.2rc3.zip
+  1) 打开 DSH「插件 -> 发现 -> 添加索引源」
+     （如果没有「发现」，先到「插件 -> 实验性插件 -> 更多」开启「自定义插件市场 / 自定义插件索引」）
 
-  0.79 MB。U盘 / 微信 / 网盘 / 局域网共享，随便哪种都行。
-  本机不需要做任何别的事，也不用安装什么。
+  2) 粘贴下面这行网址并保存：
+       https://zxeb.github.io/dsh-purge/index.json
 
+  3) 找到 dsh-purge，点「安装」即可！
 
-【目标机上前提（三件）】
-
-  1) 已经装了官方 DeepSeek Harness，而且至少启动过一次
-     （桌面版：托盘里见过它；profiles\desktop 目录要存在）
-  2) 有 Node.js 18 或更高       检查：node --version
-  3) 目标机退出 Harness：桌面版托盘右键 -> 退出
+  4) 安装完成后：完全退出 DSH（托盘右键退出）并重新打开 ->
+     点会话标题旁的 dsh-purge -> 适配 -> 应用 -> 等自动重启 -> 新开一轮对话。
 
 
-【目标机上五步】
+【方式二：直接粘贴安装包网址（DSH 界面「添加插件」或命令行）】
 
-  第 1 步  解压到纯英文路径，例如：
-              D:\dsh-plugins\dsh-purge-0.2.2\
-            （不要放在含中文的文件夹里；解压完这层要能看到 package.json）
+  安装包地址：
+    https://github.com/ZXEB/dsh-purge/releases/download/v1.1.77/dsh-purge-1.1.77.tgz
 
-  第 2 步  在这个文件夹里打开 PowerShell（地址栏输入 powershell 回车）
-
-  第 3 步  先自检（只读，不改任何东西）：
-              powershell -ExecutionPolicy Bypass -File .\check.ps1 -Profile desktop
-            看到最后一行 "RESULT: ready." 再往下走
-
-  第 4 步  安装：
-              powershell -ExecutionPolicy Bypass -File .\install.ps1 -Profile desktop
-            （命令行版 dsh web 就把 desktop 换成 web）
-            想连补丁一起打，末尾加 -Apply
-
-  第 5 步  重新打开 Harness -> 会话标题旁点 dsh-purge -> 适配 -> 应用
-            应用成功后它会自己重启一次；重启完再新开一轮对话
-
-  说明：如果第 4 步已经加了 -Apply，第 5 步只需要"重启 + 新开会话"。
+  或命令行（桌面端把 web 换成 desktop）：
+    dsh plugin --profile web add "https://github.com/ZXEB/dsh-purge/releases/download/v1.1.77/dsh-purge-1.1.77.tgz"
 
 
-【三条验收标准】
+【方式三：Windows 一键远程安装脚本（免手动下载，带 SHA256 校验）】
 
-  1) 会话标题旁出现 dsh-purge 按钮，右侧栏能打开
-  2) 聊天里输入 /purge status，打印的 DSH_HOME 是你这台机在用的那份
-  3) 面板"适配"页绝大多数是 applied；再看一次：
-       powershell -ExecutionPolicy Bypass -File .\check.ps1 -Profile desktop
-     末尾应该是 summary: applied=NN pending=0
-
-  少量 skipped / missing_file 是正常的：那是可选的第三方插件没装，
-  或者上游改了写法、该条保持原样（不会产生半改文件）。
+  $Installer = Join-Path $env:TEMP ('dsh-purge-install-' + [guid]::NewGuid().ToString('N') + '.ps1')
+  Invoke-WebRequest -UseBasicParsing -TimeoutSec 90 -Uri 'https://raw.githubusercontent.com/ZXEB/dsh-purge/master/scripts/install.ps1' -OutFile $Installer
+  powershell -NoProfile -ExecutionPolicy Bypass -File "$Installer" -DryRun
+  powershell -NoProfile -ExecutionPolicy Bypass -File "$Installer"
 
 
-【目标机没有 D 盘？】
+【方式四：无网离线安装】
 
-  解压到 C:\dsh-plugins\ 也可以，命令一样。
-  install.ps1 会自己找 DSH_HOME，不用你填。
+  拷贝 Release 里的 dsh-purge-1.1.77.tgz 到纯英文路径（如 D:\dsh-plugins\），运行：
+    dsh plugin --profile desktop add D:\dsh-plugins\dsh-purge-1.1.77.tgz
 
-
-【最常见的三个报错】
-
-  'pnpm' is not recognized
-      -> 目标机的 dsh 不是桌面自带 CLI。用 dsh.cmd 的绝对路径：
-         <安装目录>\resources\runtime\cli\bin\dsh.cmd
-         或者直接让 install.ps1 走手动注册（它会自动回退，不用管）
-
-  ERR_PNPM_STORE_DIR_OPEN_OPERATION_LOCK
-      -> 路径里有中文。把解压目录换成纯英文路径重跑
-         （install.ps1 本来会先复制到 D:\dsh-plugins 再装，若手改过路径就会犯这个）
-
-  Harness 启动报 Unexpected token ... is not valid JSON
-      -> profile 的 package.json 被写进了 BOM。
-         找同目录的 package.json.bak-<时间戳> 覆盖回去，再重跑第 4 步
-
-  dsh plugin --profile desktop 直接报错
-      -> 桌面 profile 还没初始化：先启动一次桌面客户端，完全退出，再跑
+  或解压源码 zip 到纯英文路径，在该目录运行：
+    powershell -ExecutionPolicy Bypass -File .\install.ps1 -Profile desktop
 
 
-【想反悔】
+【还原 / 卸载】
 
-  只还原宿主，保留插件：
-    powershell -ExecutionPolicy Bypass -File .\install.ps1 -Profile desktop -Revert
+  面板里直接点「适配 -> 还原 / 卸载」，或命令行：
+    node <DSH_HOME>\profiles\desktop\node_modules\dsh-purge\bin\dsh-purge.js --revert
+    node <DSH_HOME>\profiles\desktop\node_modules\dsh-purge\bin\dsh-purge.js --uninstall
 
-  连插件一起清掉：
-    node <解压目录>\bin\dsh-purge.js --uninstall
-
-  prompt-inject.md / rules / skills 是你自己的文件，这两种操作都不会删。
-
-
-【更多细节】
-
-  README.md             完整说明（安装方式、配置项、FAQ）
-  INSTALL-OTHER-PC.md   迁移清单（带截图级步骤）
-  ADAPTATION-NOTES.md   dsh 0.2.2-rc.5 的适配记录与验证结果
+  prompt-inject.md / rules / skills 是用户文件，还原和卸载都不会删。
 ========================================================================

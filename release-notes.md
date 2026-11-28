@@ -1,3 +1,23 @@
+# 1.1.77
+
+## 中文
+
+- 版本 **1.1.77**，全面优化安装体验，对齐新版 DSH 的网址安装与自定义插件市场规范：
+  - **DSH 官方界面一键安装（自定义插件市场）**：新增 DSH 官方 format 1 市场索引生成器（`scripts/build-market.mjs`）、官方校验器（`market/validate.mjs`，依赖 `@deepseek-ai/dsh-plugin-market-index`）以及自动部署 GitHub Pages 工作流（`.github/workflows/market.yml`）。在 DSH「插件 → 发现 → 添加索引源」粘贴 `https://zxeb.github.io/dsh-purge/index.json` 即可搜索并一键安装。
+  - **Release 发行包升级为标准 `.tgz` + `SHA256SUMS.txt`**：`.github/workflows/release.yml` 通过 `npm pack` 生成 `dsh-purge-1.1.77.tgz` 与 `dsh-purge.tgz`（同时保留 `dsh-purge-1.1.77.zip` 供离线使用），支持在 DSH「添加插件」界面或 `dsh plugin add` 命令行直接粘贴 `.tgz` 网址安装；且本插件无第三方 npm 运行依赖，不会受 npm 镜像源 404 影响。
+  - **补齐 `engines.dsh` 与 `dsh.compatibility` 声明**：`package.json` 新增 `engines.dsh: ">=0.2.0-rc.1 <0.3.0"`、`dsh.compatibility` 与插件图标 `docs/icon.svg`，在新版 DSH 安装及启动时可直接判定兼容，无需手工豁免。
+  - **新增跨平台一键远程安装脚本**：新增 `scripts/install.ps1`（Windows PowerShell）与 `scripts/install.sh`（macOS / Linux），无需手动下载解压，自动查询官方 Release、严格校验 SHA256、持久化归档并调用官方 `dsh plugin add`（支持 `-DryRun` / `--dry-run` 预检）。
+  - **文档重构**：更新 `README.md`、`README.en.md`、`README.zh-CN.md`、`QUICKSTART.txt`、`INSTALL-OTHER-PC.md`，将最简网址安装与一键命令置顶，保留离线目录和手动安装作为兜底方案。
+
+## English
+
+- **1.1.77**: streamlined installation to support the latest DeepSeek Harness URL & custom plugin market workflow:
+  - **One-URL DSH Custom Plugin Index**: added an official DSH format-1 index generator (`scripts/build-market.mjs`), validator (`market/validate.mjs` using `@deepseek-ai/dsh-plugin-market-index`), and automated GitHub Pages deployment workflow (`.github/workflows/market.yml`). Paste `https://zxeb.github.io/dsh-purge/index.json` into DSH **Plugins → Discover → Add index source** to install in one click.
+  - **Standard `.tgz` Release Tarballs + `SHA256SUMS.txt`**: upgraded `.github/workflows/release.yml` to build and publish `dsh-purge-<version>.tgz`, `dsh-purge.tgz`, `dsh-purge-<version>.zip`, and `SHA256SUMS.txt` for direct URL installs via DSH GUI or `dsh plugin add <url>`. Zero third-party npm runtime dependencies.
+  - **Official Compatibility Metadata**: added `engines.dsh: ">=0.2.0-rc.1 <0.3.0"`, `dsh.compatibility`, and `docs/icon.svg` to `package.json`.
+  - **Remote One-Liner Installers**: added `scripts/install.ps1` (Windows) and `scripts/install.sh` (macOS/Linux) with GitHub Release download, SHA256 verification, profile backup, and `--dry-run` support.
+  - **Updated Documentation**: reorganized installation guides (`README.md`, `README.en.md`, `README.zh-CN.md`, `QUICKSTART.txt`, `INSTALL-OTHER-PC.md`) to put URL-based install first while keeping offline/manual fallbacks.
+
 # 1.1.76
 
 ## 中文

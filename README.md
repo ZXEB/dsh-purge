@@ -4,24 +4,32 @@
 
 <h1 align="center">dsh-purge — DeepSeek Harness 本地运行时适配插件</h1>
 
-<p align="center"><strong>适配版 v1.1.76 · 对应 dsh 0.2.2-rc.5</strong></p>
+<p align="center"><strong>适配版 v1.1.77 · 对应 dsh 0.2.2-rc.5</strong></p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-1.1.76-1a73e8?style=flat" alt="version">
+  <a href="https://github.com/ZXEB/dsh-purge/releases"><img src="https://img.shields.io/github/v/release/ZXEB/dsh-purge?label=release&color=1a73e8&style=flat" alt="release"></a>
   <img src="https://img.shields.io/badge/license-MIT-65a30d?style=flat" alt="MIT">
-  <img src="https://img.shields.io/badge/dsh-0.2.2--rc.5-blue" alt="dsh 0.2.2">
-  <img src="https://img.shields.io/badge/Node.js-%3E%3D18-339933?logo=node.js&logoColor=fff" alt="Node.js">
+  <img src="https://img.shields.io/badge/dsh-0.2.2--rc.5-blue?style=flat" alt="dsh 0.2.2-rc.5">
+  <img src="https://img.shields.io/badge/Node.js-%3E%3D18-339933?logo=node.js&logoColor=fff&style=flat" alt="Node.js">
+  <a href="https://zxeb.github.io/dsh-purge/"><img src="https://img.shields.io/badge/DSH%20Market-index.json-0f766e?style=flat" alt="DSH Market"></a>
 </p>
 
 <p align="center">
-  <a href="README.md">中文</a> | <a href="README.en.md">English</a>
+  <a href="README.md">中文</a> ·
+  <a href="README.en.md">English</a> ·
+  <a href="#四安装">快速安装</a> ·
+  <a href="https://zxeb.github.io/dsh-purge/">插件市场源</a> ·
+  <a href="https://github.com/ZXEB/dsh-purge/releases/latest">最新发行包</a> ·
+  <a href="ADAPTATION-NOTES.md">适配记录</a>
 </p>
 
-> 本包是 `dsh-purge` 的**兼容性适配重建版**，用于给自己电脑上已安装的官方 DeepSeek Harness 做本地配置与产物层适配。原仓库与其 npm 包均已下线，因此**按包名安装（`dsh plugin add dsh-purge`）不可用**，请按本文第四节的 tarball / 本地目录 / 手动三种方式安装。
+> **30 秒极速安装（推荐）**：打开 DSH **「插件 → 发现 → 添加索引源」**（若无「发现」，先在「插件 → 实验性插件 → 更多」启用「自定义插件市场 / 自定义插件索引」），粘贴下方网址并保存，找到 **dsh-purge** 点击「安装」即可：
 >
-> 本版本针对 **dsh 0.2.2-rc.5** 重新校准了补丁锚点与运行期接口，适配细节见 [ADAPTATION-NOTES.md](ADAPTATION-NOTES.md)。
+> ```text
+> https://zxeb.github.io/dsh-purge/index.json
+> ```
 >
-> 要在**另一台电脑**上装：直接看 [INSTALL-OTHER-PC.md](INSTALL-OTHER-PC.md)（拷贝 zip → 解压到英文路径 → 跑 `install.ps1`）。
+> 本插件**零第三方 npm 运行依赖**（不会遇到 npm 镜像 404），同时支持直链 `.tgz`、跨平台一键远程脚本与离线安装，详见 [四、安装](#四安装) 与 [INSTALL-OTHER-PC.md](INSTALL-OTHER-PC.md)。
 
 ---
 
@@ -85,11 +93,11 @@
 
 | 项 | 要求 |
 |---|---|
-| dsh | **0.2.2-rc.5**（本包 `dshTarget`）；0.2.0 / 0.2.1 / 0.2.2-rc.1~rc.4 亦可用，个别条目会显示 `skipped` |
+| dsh | **0.2.2-rc.5**（兼容范围 `>=0.2.0-rc.1 <0.3.0`，0.2.0 / 0.2.1 / 0.2.2-rc.1~rc.5 均可用） |
 | 宿主 | 官方桌面 EXE（profile `desktop`）或官方 `dsh web`（profile `web`） |
 | Node.js | **≥ 18**；Windows 下要「无闪窗」需要 **≥ 22** |
-| 包管理器 | 用 dsh 自带的 pnpm（`dsh plugin` 会调用它），不必单独装 |
-| 网络 | 本包已适配本地目录安装，**不需要联网**即可完成安装 |
+| 包管理器 | 使用 DSH 自带的 pnpm（`dsh plugin` 会自动调用），不必单独安装 |
+| 网络与依赖 | **零第三方 npm 运行依赖**；联网支持自定义市场网址 / `.tgz` 一键装，无网支持离线包安装 |
 
 ---
 
@@ -97,168 +105,124 @@
 
 ## 四、安装
 
-### 4.0 先确认装到哪个宿主
+**让 AI 帮你装**，直接把下面这句话发给能操作本机的 Agent：
 
-| 你在跑 | profile | 说明 |
-|---|---|---|
-| 官方桌面 EXE | `desktop` | profile 需**先启动过一次客户端**才生成；安装前**完全退出**（托盘右键退出） |
-| 官方 `dsh web` | `web` | 安装前停掉正在跑的 `dsh web` |
+> 帮我把 https://github.com/ZXEB/dsh-purge 的最新稳定版安装到我正在用的 DeepSeek Harness（优先通过自定义插件索引 `https://zxeb.github.io/dsh-purge/index.json` 或最新 GitHub Release `.tgz` 安装）。装好后告诉我实际版本和 profile，由我自己重启 DSH。
 
-确认 `$DSH_HOME` 是你实际在用的那一份（本机常有两份 `.dsh`）：
+---
+
+### 4.1 方式一：DSH 官方界面「自定义插件市场」一键安装（最简单，推荐）
+
+新版 DSH 支持通过一个网址直接添加插件索引并在界面里点击安装，无需下载压缩包、无需配置本地路径：
+
+1. 打开 DSH 的 **「插件 → 发现 → 添加索引源」**。如果没有看到「发现」标签页，先到 **「插件 → 实验性插件 → 更多」** 打开 **「自定义插件市场 / 自定义插件索引」**。
+2. 在「添加索引源」里粘贴下面这一行网址并保存：
+
+   ```text
+   https://zxeb.github.io/dsh-purge/index.json
+   ```
+
+3. 在「发现」列表中找到 **dsh-purge**（核对仓库为 `ZXEB/dsh-purge`），点击 **「安装」** 即可。
+
+> 本插件**不依赖任何第三方 npm 包**（`dependencies` 为空），安装时不会因为 npm 镜像缺包报 404，也无需授权任何构建脚本。
+
+---
+
+### 4.2 方式二：DSH 官方界面「添加插件」或 CLI 直接填 `.tgz` 网址安装
+
+如果你的 DSH 界面没有启用「发现」，或者习惯直接命令行安装，可以直接粘贴稳定版 `.tgz` 下载链接：
+
+- **DSH 桌面 / Web 界面**：打开 **「插件 → 添加插件」**，在「包名或地址」中粘贴下方链接并确认安装：
+
+  ```text
+  https://github.com/ZXEB/dsh-purge/releases/download/v1.1.77/dsh-purge-1.1.77.tgz
+  ```
+
+- **DSH 官方 CLI**（桌面版请把 `web` 改为 `desktop`，且确保与正在使用的 `DSH_HOME` 一致）：
+
+  ```sh
+  # Web 宿主
+  dsh plugin --profile web add "https://github.com/ZXEB/dsh-purge/releases/download/v1.1.77/dsh-purge-1.1.77.tgz"
+
+  # 桌面宿主（建议先完全退出桌面客户端）
+  dsh plugin --profile desktop add "https://github.com/ZXEB/dsh-purge/releases/download/v1.1.77/dsh-purge-1.1.77.tgz"
+  ```
+
+> 也可以前往 [GitHub Releases 最新版](https://github.com/ZXEB/dsh-purge/releases/latest) 复制对应版本的 `dsh-purge-版本号.tgz` 链接。不要替换为裸包名 `dsh plugin add dsh-purge`（原 npm 包已下线）。
+
+---
+
+### 4.3 方式三：一键远程安装脚本（免手动下载，带 SHA256 校验）
+
+不需要手动下载压缩包或克隆仓库。脚本会自动获取最新稳定 Release、对照 `SHA256SUMS.txt` 校验完整性、备份当前 profile 的 `package.json`，再调用官方 `dsh plugin add` 安装（不修改全局 PATH、代理或自动重启 DSH）。
+
+#### Windows（PowerShell 5.1 / 7）
 
 ```powershell
-$cands = @()
-if ($env:DSH_HOME) { $cands += $env:DSH_HOME }
-$cands += "$env:USERPROFILE\.dsh"
-$cands += @("$env:APPDATA\DeepSeek Harness\dsh-home", "$env:LOCALAPPDATA\DeepSeek Harness\dsh-home")
-$cands | Select-Object -Unique | Where-Object { $_ -and (Test-Path (Join-Path $_ "profiles")) }
+$Installer = Join-Path $env:TEMP ('dsh-purge-install-' + [guid]::NewGuid().ToString('N') + '.ps1')
+Invoke-WebRequest -UseBasicParsing -TimeoutSec 90 -Uri 'https://raw.githubusercontent.com/ZXEB/dsh-purge/master/scripts/install.ps1' -OutFile $Installer
+powershell -NoProfile -ExecutionPolicy Bypass -File "$Installer" -DryRun
 ```
+
+确认输出的版本、SHA256、目标 `DSH_HOME` 与 `profile` 无误后，执行正式安装（默认 `desktop`，Web 宿主加 `-Profile web`）：
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File "$Installer"
+```
+
+#### macOS / Linux
 
 ```sh
-# macOS / Linux
-ls -d "${DSH_HOME:-$HOME/.dsh}"/profiles 2>/dev/null
+TMP_DIR="$(mktemp -d)"
+curl -fsSL --connect-timeout 20 --max-time 90 "https://raw.githubusercontent.com/ZXEB/dsh-purge/master/scripts/install.sh" -o "$TMP_DIR/install.sh"
+sh "$TMP_DIR/install.sh" --dry-run
 ```
 
-进入 `profiles/<web|desktop>/package.json`，`"name"` 应为 `dsh-profile-web` 或 `dsh-profile-desktop`。
-
----
-
-### 4.1 方式 A：本地目录安装（推荐，离线可用）
-
-把本目录（能看到 `package.json` 的那一层）直接当包源：
-
-> 先放到**纯英文路径**再装（例如 `D:\dsh-plugins\dsh-purge-0.2.2`）。`dsh plugin` 底层调用 pnpm，路径含中文时可能报 `ERR_PNPM_STORE_DIR_OPEN_OPERATION_LOCK`；`install.ps1` 会自动把插件与 pnpm store 都切到 ASCII 目录来规避。
-
-```powershell
-# Web 宿主
-dsh plugin --profile web add D:\dsh-plugins\dsh-purge-0.2.2
-
-# 桌面宿主（先完全退出桌面客户端）
-dsh plugin --profile desktop add D:\dsh-plugins\dsh-purge-0.2.2
-```
+确认无误后执行正式安装（可按需追加 `--profile=desktop` 或 `--profile=web`）：
 
 ```sh
-dsh plugin --profile web add /path/to/dsh-purge-0.2.2
+sh "$TMP_DIR/install.sh"
 ```
-
-当前 shell 就在目录里时也可以 `dsh plugin --profile web add .`。
-
-拷目录要拷**整个目录**（`lib/ client.js docs/ presets/ skills/ bin/`），不要只拷几个 `.js` —— `client.js` 是侧栏前端产物，缺了就只有命令行、没有面板。
 
 ---
 
-### 4.2 方式 B：手动安装（CLI 不可用时兜底）
+### 4.4 方式四：离线本地目录 / 手动安装（无网环境兜底）
 
-只改**正在用的那个宿主**对应的 profile，不要动另一个，也不要删原有 bundle。
+如果目标电脑无法访问 GitHub，可从 [Releases](https://github.com/ZXEB/dsh-purge/releases/latest) 下载 `dsh-purge-1.1.77.tgz` 或 `dsh-purge-1.1.77.zip` 拷贝过去离线安装：
 
-**第 1 步：把插件放进 `$DSH_HOME/plugins/dsh-purge`**
+- **直接安装本地 `.tgz`**：
+  ```powershell
+  dsh plugin --profile desktop add D:\dsh-plugins\dsh-purge-1.1.77.tgz
+  ```
+- **解压源码包后用本地脚本（Windows）**：解压到纯英文路径（如 `D:\dsh-plugins\dsh-purge`），运行：
+  ```powershell
+  powershell -ExecutionPolicy Bypass -File .\check.ps1 -Profile desktop
+  powershell -ExecutionPolicy Bypass -File .\install.ps1 -Profile desktop
+  ```
+- **纯手工兜底**（CLI 不可用时）：详见 [INSTALL-OTHER-PC.md](INSTALL-OTHER-PC.md)（复制目录到 `$DSH_HOME/plugins/dsh-purge`，在 `profiles/<web|desktop>/package.json` 的 `dependencies` 与 `dsh.profile.bundles` 登记 `dsh-purge`，再执行 `pnpm install`）。
 
-目录名必须是 `dsh-purge`，里面 `package.json` 的 `"name"` 也必须是 `dsh-purge`。把本目录整体复制并改名即可。
-
-**第 2 步：备份并修改 profile 的 `package.json`**
-
-Web → `$DSH_HOME/profiles/web/package.json`；桌面 → `$DSH_HOME/profiles/desktop/package.json`。**只追加两处**：
-
-1. `dependencies` 增加 `"dsh-purge": "file:../../plugins/dsh-purge"`
-2. `dsh.profile.bundles` **末尾**追加 `"dsh-purge"`（已有就别重复加）
-
-```json
-{
-  "name": "dsh-profile-web",
-  "private": true,
-  "dependencies": {
-    "dsh-purge": "file:../../plugins/dsh-purge"
-  },
-  "dsh": {
-    "profile": {
-      "bundles": [
-        "@deepseek-ai/dsh-base",
-        "@deepseek-ai/dsh-web-app",
-        "dsh-purge"
-      ]
-    }
-  }
-}
-```
-
-JSON 必须合法（新增项前有逗号、最后一项后没有多余逗号）。`file:` 保持相对路径；`patchReload`、其它插件、版本号都别动。
-
-**第 3 步：只在刚改的那个 profile 目录里装依赖**
-
-```sh
-cd "$DSH_HOME/profiles/web"    # 或 profiles/desktop
-pnpm install
-```
-
-成功标志：出现 `profiles/<web|desktop>/node_modules/dsh-purge/package.json`。报 `Could not resolve` 就查 `file:` 路径；JSON 解析失败就修逗号或还原备份。
-
----
-
-### 4.3 一键脚本（Windows）
-
-本目录自带 `install.ps1`，会自动定位宿主、备份 profile、安装依赖并打印补丁状态：
-
-```powershell
-# 桌面宿主
-powershell -ExecutionPolicy Bypass -File .\install.ps1 -Profile desktop
-
-# Web 宿主
-powershell -ExecutionPolicy Bypass -File .\install.ps1 -Profile web -DshHome "$env:USERPROFILE\.dsh"
-```
-
-只查看状态、不做改动：
-
-```powershell
-powershell -ExecutionPolicy Bypass -File .\install.ps1 -Profile desktop -StatusOnly
-```
-
-装前/装后想先做一次完整体检（**只读，不改任何文件**）：
-
-```powershell
-powershell -ExecutionPolicy Bypass -File .\check.ps1 -Profile desktop
-```
-
-它会检查 Node 版本、dsh CLI、`DSH_HOME` 候选、profile 是否初始化、路径是否纯英文、是否已装过、以及补丁状态汇总，最后一行给出 `RESULT: ready.` 或阻塞项。
-
----
-
-### 4.4 `dsh` 不在 PATH 怎么办
-
-桌面版自带一份 CLI，Windows 通常在安装目录下：
-
-```
-<安装目录>\resources\runtime\cli\bin\dsh.cmd
-```
-
-直接用它，参数完全一致：
-
-```powershell
-& "D:\dsh\resources\runtime\cli\bin\dsh.cmd" plugin --profile desktop add D:\path\to\dsh-purge-0.2.2
-```
-
-先 `Get-Command dsh` 看一眼有没有；没有就用上面的绝对路径。
+如果 `dsh` 不在 `PATH` 中，桌面版自带 CLI 位于 `<安装目录>\resources\runtime\cli\bin\dsh.cmd`，可直接用完整路径调用，参数完全一致。
 
 ---
 
 ### 4.5 安装后的三步
 
-1. **完全退出并重开**你装的那个宿主：桌面端托盘退出再开；`dsh web` 停进程再启动。
+1. **完全退出并重开**你装的那个宿主：桌面端托盘右键退出再开；`dsh web` 停进程再启动。
 2. 在**那个宿主**上点会话标题旁的 **dsh-purge** → **适配** → **应用**（不在设置页里）。
-3. 应用成功后宿主会自重启一次（补丁在重启后加载）；没跑完不会重启。
+3. 应用成功后宿主会自重启一次（补丁在重启后加载）；重启后新开一轮对话即生效。
 
-> Web 的开关只影响 Web，桌面的开关只影响桌面。不要在一个宿主里给另一个宿主点应用。
-> 也可以纯命令行应用：`node <插件目录>\bin\dsh-purge.js --apply`。
+> Web 与桌面是两份独立的 profile，分别安装、分别应用。
+> 也可以纯命令行应用：`node <profile>\node_modules\dsh-purge\bin\dsh-purge.js --apply`。
 
 ---
 
 ### 4.6 安装验证清单
 
 - [ ] `profiles/<web|desktop>/package.json` 里同时有 `dependencies.dsh-purge` 和 `dsh.profile.bundles` 里的 `dsh-purge`
-- [ ] `profiles/<web|desktop>/node_modules/dsh-purge/package.json` 存在
+- [ ] `profiles/<web|desktop>/node_modules/dsh-purge/package.json` 存在且版本为 `1.1.77`
 - [ ] 宿主界面会话标题旁出现 **dsh-purge** 按钮，右侧栏能打开
 - [ ] 聊天里 `/purge status` 打印 `DSH_HOME` 与补丁列表，且路径是你实际在跑的那份
 - [ ] 模型侧有 `purge_status` / `purge_apply` / `purge_revert` 三个工具（说明 bundle 已加载）
-- [ ] `node <插件>\bin\dsh-purge.js --status` 能列出补丁状态
 
 可选包（例如第三方 mnemon / liangshen 相关条目）没装时显示 `skipped` / `missing_file`，不阻塞应用，属正常。
 
@@ -279,7 +243,8 @@ powershell -ExecutionPolicy Bypass -File .\check.ps1 -Profile desktop
 | `client.js` | 侧栏前端产物（构建自 `scripts/build-client.mjs`） |
 | `cordis.patch.yml` | bundle patch：注册 `dsh-purge`、`dsh-purge/redteam`、`store`、`ui` 四个入口 |
 | `presets/` / `skills/` | 预设与随包技能（可选模块用） |
-| `scripts/` | 构建 / 嵌入 / 补丁脚本 |
+| `scripts/` | 远程一键安装脚本（`install.ps1` / `install.sh`）、市场索引生成（`build-market.mjs`）及构建脚本 |
+| `market/` | DSH 官方 format 1 市场索引校验器与说明 |
 
 运行时（`$DSH_HOME` 下，Web 与桌面各一份）：
 
@@ -404,7 +369,10 @@ dsh-purge --uninstall     # 或 /purge uninstall，或面板「适配 → 卸载
 
 会先还原（若已应用）再删除注入文件、规则库与插件登记，然后重启宿主。
 
-**升级到新版**：用新目录替换旧目录后重跑安装（方式 A / B），再应用一次。npm/pnpm 覆盖 `node_modules` 后补丁会丢，把 `autoApplyOnStart` 设成 `true` 可自动补回。
+**升级到新版**：
+- 通过 DSH 自定义插件市场安装的用户，可直接在 DSH「插件」页检查并一键升级；
+- 通过 `.tgz` 或远程脚本安装的用户，直接重新运行新版 `.tgz` 安装命令或 `scripts/install.ps1` / `install.sh` 即可；
+- 升级并重启宿主后，进入面板重新点击一次「应用」。npm/pnpm 覆盖 `node_modules` 后补丁会重置，把 `autoApplyOnStart` 设成 `true` 可自动补回。
 
 ---
 
@@ -413,29 +381,29 @@ dsh-purge --uninstall     # 或 /purge uninstall，或面板「适配 → 卸载
 ## 十、常见问题（FAQ）
 
 **1. `dsh plugin add dsh-purge` 装不上**
-原 npm 包已下线。请用 [4.1](#41-方式-a本地目录安装推荐离线可用) 的本地目录方式，或 [4.2](#42-方式-b手动安装cli-不可用时兜底) 手动方式。
+原 npm 包已下线。请使用 [4.1 自定义插件市场一键安装](#41-方式一dsh-官方界面自定义插件市场一键安装最简单推荐)（粘贴 `https://zxeb.github.io/dsh-purge/index.json`）或 [4.2 直接填入 `.tgz` 网址](#42-方式二dsh-官方界面添加插件或-cli-直接填-tgz-网址安装)。
 
 **2. `dsh plugin` 报 `pnpm was not found`**
-用 dsh 自带 CLI（`resources\runtime\cli\bin\dsh.cmd`），它会带内置 pnpm；自己装的话确保 pnpm 在 PATH。
+用 dsh 自带 CLI（`<安装目录>\resources\runtime\cli\bin\dsh.cmd`），它会带内置 pnpm；自己装的话确保 pnpm 在 PATH。
 
 **3. 报 `plugin command failed`**
-看它给出的 `logPath`。常见是 profile JSON 写坏、`file:` 路径不对。
+查看报错给出的 `logPath`。常见原因是 profile `package.json` 语法损坏、Windows 路径含中文导致 pnpm store 锁冲突（远程脚本与 `install.ps1` 会自动规避）或本地文件路径失效。
 
 **4. 报版本不匹配（incompatible）**
-本包 `dshTarget` 是 `0.2.2-rc.5`。确认 dsh 在 0.2.x；跨小版本可用：
+本包已在 `package.json` 声明 `engines.dsh: ">=0.2.0-rc.1 <0.3.0"`，覆盖全部 0.2.x 版本。如果未来跨大版本需要强制放行，可执行：
 
 ```sh
-dsh plugin --profile web allow-version dsh-purge@1.1.76 --dsh-version <你的精确版本> --accept-risk
+dsh plugin --profile web allow-version dsh-purge@1.1.77 --dsh-version <你的精确版本> --accept-risk
 ```
 
 **5. 桌面端 `dsh plugin --profile desktop ...` 直接报错**
 桌面 profile 还没初始化：先启动一次桌面客户端，**完全退出**后再跑命令。
 
 **6. 装好了但会话标题旁没有 dsh-purge**
-- 装错宿主了（见 [4.0](#40-先确认装到哪个宿主)）；
-- 没重启宿主；
-- profile 里少了 `dsh.profile.bundles` 里的 `dsh-purge`（只加依赖不会加载）；
-- `client.js` 没跟着拷过去。
+- 装到了另一个宿主（桌面版使用 `desktop` profile，命令行 `dsh web` 使用 `web` profile，两者各自独立）；
+- 还没有完全退出并重启宿主；
+- 手动安装时漏加了 `dsh.profile.bundles` 里的 `"dsh-purge"`（只加 `dependencies` 不会加载）；
+- 离线拷贝目录时漏拷了 `client.js`。
 
 **7. 点了「应用」但行为没变**
 补丁要**重启后**才加载。正确顺序：应用 → 等自动重启 → 新开一轮对话。
@@ -444,7 +412,7 @@ dsh plugin --profile web allow-version dsh-purge@1.1.76 --dsh-version <你的精
 宿主版本不同或装了精简产物，锚点对不上时只显示跳过（不会乱改）。缺失项对应的可选包（第三方 mnemon / liangshen 等）没装时属正常，其余仍能完成。
 
 **9. 想在另一台电脑上用**
-可以。插件只与本机 `@deepseek-ai` 包和 `$DSH_HOME` 交互：把本目录整个拷过去，按第四节装一遍即可（无需联网）。
+有网络时直接在新电脑的 DSH「插件 → 发现 → 添加索引源」填入 `https://zxeb.github.io/dsh-purge/index.json` 一键安装即可；完全离线环境请参考 [INSTALL-OTHER-PC.md](INSTALL-OTHER-PC.md) 拷贝 `.tgz` 或 `.zip` 安装。
 
 ---
 
@@ -454,7 +422,8 @@ dsh plugin --profile web allow-version dsh-purge@1.1.76 --dsh-version <你的精
 
 | 插件版本 | 适配 dsh | 说明 |
 |---|---|---|
-| **1.1.76**（本适配版） | **0.2.2-rc.5** | 适配 rc.5 全部 332 包 + `pi-ai@1.6`；补齐扩展预设/子代理接口/`CONTENT_REFUSED`，恢复 `#32` `#40` `#56` `#77` `#57` 并修复首次升级重复解包 |
+| **1.1.77**（当前版） | **0.2.2-rc.5**（`>=0.2.0-rc.1 <0.3.0`） | 新增 DSH 官方 format 1 自定义插件市场索引（`https://zxeb.github.io/dsh-purge/index.json`）、标准 `.tgz` Release 发行包与跨平台一键远程安装脚本；声明 `engines.dsh` 兼容范围 |
+| 1.1.76 | 0.2.2-rc.5 | 适配 rc.5 全部 332 包 + `pi-ai@1.6`；补齐扩展预设/子代理接口/`CONTENT_REFUSED`，恢复 `#32` `#40` `#56` `#77` `#57` 并修复首次升级重复解包 |
 | 1.1.76 同版向下 | 0.2.2-rc.1~rc.4、0.2.1-rc.x、0.2.0-rc.2 | 状态探测 **0 回归**，旧写法锚点与 `listChildren` 回退均保留 |
 | 1.1.75 | 0.2.2-rc.3 | 修复 `{{cwd}}` 变量缺失、组装兜底丢工具与 DSML 正文重试 |
 | 1.1.73–1.1.74 | 0.2.2-rc.3 | 锚点重校准 + 读前校验与 hooks 幂等修复 |

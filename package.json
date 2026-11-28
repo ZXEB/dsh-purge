@@ -1,9 +1,10 @@
 {
   "name": "dsh-purge",
-  "version": "1.1.76",
+  "version": "1.1.77",
   "description": "DeepSeek Harness 本地运行时适配插件：一张可回滚的宿主默认值与提示词段补丁表，支持面板状态查看、一键应用/还原/卸载。 Local runtime adaptation plugin for DeepSeek Harness - a reversible patch table for host defaults and prompt segments.",
   "type": "module",
   "main": "lib/index.js",
+  "icon": "./docs/icon.svg",
   "exports": {
     ".": {
       "default": "./lib/index.js"
@@ -28,6 +29,7 @@
     "scripts",
     "client.js",
     "cordis.patch.yml",
+    "screenshots.json",
     "README.md",
     "README.en.md",
     "README.zh-CN.md",
@@ -39,7 +41,9 @@
   ],
   "scripts": {
     "embed-prompt": "node scripts/embed-default-prompt.mjs",
-    "build:client": "node scripts/build-client.mjs"
+    "build:client": "node scripts/build-client.mjs",
+    "build:market": "node scripts/build-market.mjs",
+    "validate:market": "node market/validate.mjs market-dist/index.json"
   },
   "license": "MIT",
   "keywords": [
@@ -79,9 +83,26 @@
     },
     "install": {
       "preferred": "tarball",
-      "tarball": "https://github.com/ZXEB/dsh-purge/archive/refs/heads/master.tar.gz",
-      "zip": "https://github.com/ZXEB/dsh-purge/archive/refs/heads/master.zip",
+      "market": "https://zxeb.github.io/dsh-purge/index.json",
+      "tarball": "https://github.com/ZXEB/dsh-purge/releases/download/v1.1.77/dsh-purge-1.1.77.tgz",
+      "zip": "https://github.com/ZXEB/dsh-purge/releases/download/v1.1.77/dsh-purge-1.1.77.zip",
       "git": "https://github.com/ZXEB/dsh-purge.git"
+    },
+    "compatibility": {
+      "dsh": ">=0.2.0-rc.1 <0.3.0",
+      "profiles": [
+        "desktop",
+        "web"
+      ],
+      "dshReleases": {
+        "0.2.0-rc.2": "compatible",
+        "0.2.1-rc.3": "compatible",
+        "0.2.2-rc.1": "compatible",
+        "0.2.2-rc.2": "compatible",
+        "0.2.2-rc.3": "compatible",
+        "0.2.2-rc.4": "compatible",
+        "0.2.2-rc.5": "compatible"
+      }
     }
   },
   "publishConfig": {
@@ -91,7 +112,12 @@
     "@deepseek-ai/cordis": "^4.0.1"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=18",
+    "dsh": ">=0.2.0-rc.1 <0.3.0"
+  },
+  "author": {
+    "name": "ZXEB",
+    "url": "https://github.com/ZXEB"
   },
   "dshTarget": "0.2.2-rc.5"
 }

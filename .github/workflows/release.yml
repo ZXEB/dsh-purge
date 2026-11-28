@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - master
+    tags:
+      - 'v*'
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -21,6 +24,10 @@ jobs:
         with:
           fetch-depth: 0
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
       - name: Syntax-check plugin entry
         run: |
           node --check lib/index.js
@@ -28,38 +35,68 @@ jobs:
           node --check lib/reapply.js
           node --check lib/update.js
           node --check lib/uninstall.js
+          node --check bin/dsh-purge.js
           node --check client.js
-          node -e "const p=require('./package.json'); if(!p.name||!p.version) process.exit(1); console.log('package.json ok: '+p.name+'@'+p.version)"
+          node --check scripts/build-market.mjs
+          node -e "const p=require('./package.json'); if(p.name!=='dsh-purge'||!p.version||!p.dsh?.bundle||!p.engines?.dsh) process.exit(1); console.log('package.json ok: '+p.name+'@'+p.version+' engines.dsh='+p.engines.dsh)"
 
-      - name: Publish GitHub Release
+      - name: Build and publish GitHub Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
           version="$(node -p "require('./package.json').version")"
           tag="v${version}"
+
           if gh release view "$tag" >/dev/null 2>&1; then
             echo "already published: $tag"
             exit 0
           fi
+
           first="$(head -n 1 release-notes.md | tr -d '\r')"
           if [ "$first" != "# ${version}" ]; then
             echo "release-notes.md 第一行必须是 # ${version}，现在是: ${first}"
             exit 1
           fi
+
+          # Extract only the current version's section for cleaner Release notes
+          node -e '
+            const fs = require("node:fs");
+            const ver = process.argv[1];
+            const lines = fs.readFileSync("release-notes.md", "utf8").replace(/\r\n/g, "\n").split("\n");
+            const out = [];
+            for (let i = 0; i < lines.length; i++) {
+              if (i > 0 && /^# \d+\.\d+\.\d+/.test(lines[i])) break;
+              out.push(lines[i]);
+            }
+            fs.writeFileSync("current-release-notes.md", out.join("\n").trim() + "\n");
+          ' "$version"
+
+          # Build standard npm tarball (.tgz) for DSH GUI / CLI direct URL install
+          npm pack --ignore-scripts
+          tgz="dsh-purge-${version}.tgz"
+          test -s "$tgz"
+          cp "$tgz" dsh-purge.tgz
+
+          # Also build source zip for offline / legacy workflows
           zip="dsh-purge-${version}.zip"
           if git rev-parse -q --verify "refs/tags/${tag}^{}" >/dev/null; then
             commit="$(git rev-parse "refs/tags/${tag}^{}")"
             git archive --format=zip --prefix="dsh-purge-${version}/" --output="$zip" "$commit"
-            gh release create "$tag" --title "$tag" --notes-file release-notes.md
           else
             git archive --format=zip --prefix="dsh-purge-${version}/" --output="$zip" HEAD
-            args=(release create "$tag" --target "$GITHUB_SHA" --title "$tag" --notes-file release-notes.md)
-            case "$version" in
-              *beta*|*alpha*|*rc*) args+=(--prerelease) ;;
-            esac
-            gh "${args[@]}"
           fi
           test -s "$zip"
-          gh release upload "$tag" "$zip" --clobber
+
+          sha256sum "$tgz" dsh-purge.tgz "$zip" > SHA256SUMS.txt
+          cat SHA256SUMS.txt
+
+          args=(release create "$tag" "$tgz" dsh-purge.tgz "$zip" SHA256SUMS.txt --title "dsh-purge ${version}" --notes-file current-release-notes.md)
+          if ! git rev-parse -q --verify "refs/tags/${tag}^{}" >/dev/null; then
+            args+=(--target "$GITHUB_SHA")
+          fi
+          case "$version" in
+            *beta*|*alpha*|*rc*) args+=(--prerelease) ;;
+          esac
+          gh "${args[@]}"
           echo "published https://github.com/ZXEB/dsh-purge/releases/tag/${tag}"

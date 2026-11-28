@@ -1,0 +1,59 @@
+name: Publish plugin market
+
+on:
+  workflow_run:
+    workflows: ['Release']
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    if: github.repository == 'ZXEB/dsh-purge' && (github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Refresh release tags
+        run: git fetch --tags --force
+
+      - name: Install official DSH format-1 market validator
+        run: npm --prefix market install --ignore-scripts --legacy-peer-deps
+
+      - name: Build plugin market index
+        run: node scripts/build-market.mjs
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Validate format-1 index
+        run: node market/validate.mjs market-dist/index.json
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: market-dist
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy plugin market index
+        id: deployment
+        uses: actions/deploy-pages@v4

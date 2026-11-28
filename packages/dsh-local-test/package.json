@@ -1,0 +1,36 @@
+{
+  "name": "dsh-local-test",
+  "version": "0.1.0",
+  "description": "DSH 桌面版本诊断和单个网站连通性检查",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./typert": "./src/typert.js",
+    "./remote": "./src/remote.js",
+    "./package.json": "./package.json"
+  },
+  "files": ["lib", "src/core.js", "src/remote.js", "src/typert.js", "cordis.patch.yml", "README.md", "VALIDATION.md", "LICENSE"],
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node --test test/*.test.mjs",
+    "prepack": "node scripts/build.mjs"
+  },
+  "dsh": {
+    "bundle": { "patch": "./cordis.patch.yml" },
+    "client": {
+      "platform": "web",
+      "inject": ["@deepseek-ai/dsh-api-remotes", "@deepseek-ai/dsh-client-ui-renderer", "@deepseek-ai/dsh-client-ui-settings"]
+    }
+  },
+  "engines": { "node": ">=24", "dsh": "0.2.2-rc.3" },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "~4.1.0",
+    "@deepseek-ai/dsh-typert-protocol": "0.2.2-rc.3"
+  },
+  "dependencies": { "zod": "4.6.6" },
+  "devDependencies": { "esbuild": "0.28.2", "react": "18.3.1", "react-dom": "18.3.1", "@deepseek-ai/dsh-typert-registry": "0.2.2-rc.3", "@deepseek-ai/dsh-api-gateway": "0.2.2-rc.3" },
+  "license": "MIT",
+  "repository": { "type": "git", "url": "https://github.com/ZXEB/dsh-purge.git", "directory": "packages/dsh-local-test" }
+}

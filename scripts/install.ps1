@@ -123,22 +123,45 @@ try {
   Say-Ok "profile       : $Profile"
   Say-Ok "dsh cli       : $cli"
 
-  # 2. Resolve release metadata
-  $apiUrl = if ($Version) {
-    $v = $Version.TrimStart('v')
-    "https://api.github.com/repos/$Repo/releases/tags/v$v"
-  } else {
-    "https://api.github.com/repos/$Repo/releases/latest"
+  # 2. Resolve release version (rate-limit-free: market index -> releases/latest redirect -> GitHub API)
+  $ver = if ($Version) { $Version.TrimStart('v') } else { '' }
+  if (-not $ver) {
+    try {
+      Say-Info 'checking latest version via market index...'
+      $idx = Invoke-RestMethod -Headers @{ 'User-Agent' = 'dsh-purge-installer' } -TimeoutSec 30 -Uri 'https://zxeb.github.io/dsh-purge/index.json'
+      $ver = [string]$idx.plugins[0].versions[0].version
+    } catch {
+      Say-Warn "market index query failed ($($_.Exception.Message)); falling back to releases/latest redirect"
+    }
   }
-  Say-Info "querying release: $apiUrl"
-  $release = Invoke-RestMethod -Headers @{ 'User-Agent' = 'dsh-purge-installer'; Accept = 'application/vnd.github+json' } -TimeoutSec 30 -Uri $apiUrl
-  $tag = [string]$release.tag_name
-  $ver = $tag.TrimStart('v')
+  if (-not $ver) {
+    try {
+      $req = [System.Net.HttpWebRequest]::Create("https://github.com/$Repo/releases/latest")
+      $req.UserAgent = 'dsh-purge-installer'
+      $req.AllowAutoRedirect = $false
+      $req.Timeout = 30000
+      $resp = $req.GetResponse()
+      try {
+        $loc = $resp.Headers['Location']
+        if ($loc -match '/releases/tag/v?([^/?#]+)$') { $ver = $Matches[1] }
+      } finally { $resp.Close() }
+    } catch [System.Net.WebException] {
+      if ($_.Exception.Response) {
+        $loc = $_.Exception.Response.Headers['Location']
+        if ($loc -match '/releases/tag/v?([^/?#]+)$') { $ver = $Matches[1] }
+      }
+    }
+  }
+  if (-not $ver) {
+    $release = Invoke-RestMethod -Headers @{ 'User-Agent' = 'dsh-purge-installer'; Accept = 'application/vnd.github+json' } -TimeoutSec 30 -Uri "https://api.github.com/repos/$Repo/releases/latest"
+    $ver = ([string]$release.tag_name).TrimStart('v')
+  }
+  if (-not $ver) { Say-Fail 'Could not resolve latest release version. Pass -Version <X.Y.Z>.' }
+
+  $tag = "v$ver"
   $tgzName = "dsh-purge-$ver.tgz"
-  $tgzAsset = $release.assets | Where-Object { $_.name -eq $tgzName } | Select-Object -First 1
-  $sumAsset = $release.assets | Where-Object { $_.name -eq 'SHA256SUMS.txt' } | Select-Object -First 1
-  if (-not $tgzAsset) { Say-Fail "Release $tag does not contain $tgzName" }
-  if (-not $sumAsset) { Say-Fail "Release $tag does not contain SHA256SUMS.txt" }
+  $tgzUrl = "https://github.com/$Repo/releases/download/$tag/$tgzName"
+  $sumUrl = "https://github.com/$Repo/releases/download/$tag/SHA256SUMS.txt"
   Say-Ok "release       : $tag ($tgzName)"
 
   # 3. Download and verify SHA256
@@ -146,8 +169,8 @@ try {
   $tmpTgz = Join-Path $tmpDir $tgzName
   $tmpSum = Join-Path $tmpDir 'SHA256SUMS.txt'
   Say-Info "downloading $tgzName ..."
-  Download-File $tgzAsset.browser_download_url $tmpTgz
-  Download-File $sumAsset.browser_download_url $tmpSum
+  Download-File $tgzUrl $tmpTgz
+  Download-File $sumUrl $tmpSum
 
   $expectedHash = $null
   foreach ($line in (Get-Content -LiteralPath $tmpSum)) {

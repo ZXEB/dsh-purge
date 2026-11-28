@@ -83,28 +83,27 @@ say_ok "DSH_HOME : $DSH_HOME_DIR"
 say_ok "profile  : $PROFILE"
 say_ok "dsh cli  : $DSH_CLI"
 
-# 4. Query GitHub Release
+# 4. Resolve release version (rate-limit-free: market index -> releases/latest redirect)
 TMP_DIR="$(mktemp -d "${TMPDIR:-/tmp}/dsh-purge-dl.XXXXXX")"
 trap 'rm -rf "$TMP_DIR"' 0
 trap 'exit 130' INT
 trap 'exit 143' TERM
 
 if [ -n "$VERSION" ]; then
-  VER_CLEAN="${VERSION#v}"
-  API_URL="https://api.github.com/repos/$REPO/releases/tags/v$VER_CLEAN"
+  VER="${VERSION#v}"
 else
-  API_URL="https://api.github.com/repos/$REPO/releases/latest"
+  say_info "checking latest version via market index..."
+  VER="$(curl -fsSL --connect-timeout 20 --max-time 30 -A "dsh-purge-installer" "https://zxeb.github.io/dsh-purge/index.json" 2>/dev/null \
+    | sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\)".*/\1/p' | head -n 1 || true)"
+  if [ -z "$VER" ]; then
+    FINAL_URL="$(curl -fsSLI -o /dev/null -w '%{url_effective}' --connect-timeout 20 --max-time 30 -A "dsh-purge-installer" "https://github.com/$REPO/releases/latest" || true)"
+    TAG_FALLBACK="${FINAL_URL##*/}"
+    VER="${TAG_FALLBACK#v}"
+  fi
 fi
 
-say_info "querying release: $API_URL"
-curl -fsSL --connect-timeout 20 --max-time 60 \
-  -H "Accept: application/vnd.github+json" \
-  -H "User-Agent: dsh-purge-installer" \
-  "$API_URL" -o "$TMP_DIR/release.json"
-
-TAG="$(sed -n 's/.*"tag_name"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$TMP_DIR/release.json" | head -n 1)"
-[ -n "$TAG" ] || say_fail "Failed to parse tag_name from GitHub release metadata."
-VER="${TAG#v}"
+[ -n "$VER" ] || say_fail "Failed to resolve latest release version. Pass --version=X.Y.Z."
+TAG="v${VER}"
 TGZ_NAME="dsh-purge-${VER}.tgz"
 TGZ_URL="https://github.com/$REPO/releases/download/$TAG/$TGZ_NAME"
 SUM_URL="https://github.com/$REPO/releases/download/$TAG/SHA256SUMS.txt"
